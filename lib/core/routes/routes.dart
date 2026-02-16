@@ -9,10 +9,7 @@ import '../../presentation/screens/authentication/reset_password_success.dart';
 import '../../presentation/screens/authentication/sign_up.dart';
 import '../../presentation/screens/authentication/sign_up_otp.dart';
 import '../../presentation/screens/splash/splash.dart';
-import '../../presentation/screens/job/job.dart';
-import '../../presentation/screens/calender/calender.dart';
-import '../../presentation/screens/vehicle/vehicle.dart';
-import '../../presentation/screens/profile/profile.dart';
+import '../../presentation/widgets/custom_navigation/main_navigation.dart';
 import '../../presentation/screens/notification/notification.dart';
 import 'route_observer.dart';
 import 'route_path.dart';
@@ -71,28 +68,28 @@ class AppRouter {
       GoRoute(
         name: RoutePath.home,
         path: RoutePath.home.addBasePath,
-        builder: (context, state) => const JobScreen(),
+        builder: (context, state) => const MainNavigation(initialIndex: 0),
       ),
 
       // ================== Calendar ==================
       GoRoute(
         name: RoutePath.calendar,
         path: RoutePath.calendar.addBasePath,
-        builder: (context, state) => const CalendarScreen(),
+        builder: (context, state) => const MainNavigation(initialIndex: 1),
       ),
 
       // ================== Vehicle ==================
       GoRoute(
         name: RoutePath.vehicle,
         path: RoutePath.vehicle.addBasePath,
-        builder: (context, state) => const VehicleScreen(),
+        builder: (context, state) => const MainNavigation(initialIndex: 2),
       ),
 
       // ================== Profile ==================
       GoRoute(
         name: RoutePath.profile,
         path: RoutePath.profile.addBasePath,
-        builder: (context, state) => const ProfileScreen(),
+        builder: (context, state) => const MainNavigation(initialIndex: 3),
       ),
 
       // ================== Notification ==================

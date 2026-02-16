@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -27,25 +26,32 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Calender',
-          style: TextStyle(color: Colors.black, fontSize: 18),
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          // Tabs
-          Container(
-            color: Colors.white,
-            child: TabBar(
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Calendar',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ),
+            // Tabs
+            TabBar(
               controller: _tabController,
               labelColor: const Color(0xFFF63C00),
               unselectedLabelColor: Colors.grey,
@@ -56,24 +62,18 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                 Tab(text: 'This Week'),
               ],
             ),
-          ),
-          // Timeline
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildTimeline(),
-                _buildTimeline(),
-                _buildTimeline(),
-              ],
+            // Timeline
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildTimeline(),
+                  _buildTimeline(),
+                  _buildTimeline(),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 53),
-        child: CustomNavBar(
-          currentIndex: 1,
+          ],
         ),
       ),
     );

@@ -104,12 +104,6 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 53),
-        child: CustomNavBar(
-          currentIndex: 0,
-        ),
-      ),
     );
   }
 
