@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/routes/route_path.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -118,17 +120,23 @@ class ProfileScreen extends StatelessWidget {
             _buildMenuItem(
               icon: Icons.verified_user_outlined,
               title: 'Certification & Skills',
-              onTap: () {},
+              onTap: () {
+                context.pushNamed(RoutePath.certification);
+              },
             ),
             _buildMenuItem(
               icon: Icons.headset_mic_outlined,
               title: 'Support & Help',
-              onTap: () {},
+              onTap: () {
+                _showSupportMenu(context);
+              },
             ),
             _buildMenuItem(
               icon: Icons.report_problem_outlined,
               title: 'Report an Issue',
-              onTap: () {},
+              onTap: () {
+                context.pushNamed(RoutePath.reportIssue);
+              },
             ),
             const SizedBox(height: 20),
             // Logout Button
@@ -205,6 +213,85 @@ class ProfileScreen extends StatelessWidget {
         ),
         trailing: const Icon(Icons.chevron_right, size: 24),
         onTap: onTap,
+      ),
+    );
+  }
+
+  void _showSupportMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Support & Help',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildSupportMenuItem(
+                context,
+                'FAQs',
+                () => context.pushNamed(RoutePath.faqs),
+              ),
+              _buildSupportMenuItem(
+                context,
+                'Contact Support',
+                () => context.pushNamed(RoutePath.contactSupport),
+              ),
+              _buildSupportMenuItem(
+                context,
+                'Privacy Policy',
+                () => context.pushNamed(RoutePath.privacyPolicy),
+              ),
+              _buildSupportMenuItem(
+                context,
+                'Terms & Conditions',
+                () => context.pushNamed(RoutePath.termsAndConditions),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSupportMenuItem(BuildContext context, String title, VoidCallback onTap) {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+        onTap();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey[200]!),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            const Icon(Icons.chevron_right, size: 20),
+          ],
+        ),
       ),
     );
   }

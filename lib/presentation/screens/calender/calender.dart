@@ -9,6 +9,8 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _selectedDay = 18;
+  String _selectedMonth = 'January';
 
   @override
   void initState() {
@@ -69,7 +71,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                 children: [
                   _buildTimeline(),
                   _buildTimeline(),
-                  _buildTimeline(),
+                  _buildWeekView(),
                 ],
               ),
             ),
@@ -223,6 +225,119 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildWeekView() {
+    return Column(
+      children: [
+        // Calendar Widget
+        Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFCCBB),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              // Month Selector
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _selectedMonth,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Week Days
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildWeekDayLabel('Sun'),
+                  _buildWeekDayLabel('Mon'),
+                  _buildWeekDayLabel('Tue'),
+                  _buildWeekDayLabel('Wed'),
+                  _buildWeekDayLabel('Thu'),
+                  _buildWeekDayLabel('Fri'),
+                  _buildWeekDayLabel('Sat'),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Week Days Numbers
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildDayNumber(16, false),
+                  _buildDayNumber(17, false),
+                  _buildDayNumber(18, false),
+                  _buildDayNumber(19, true),
+                  _buildDayNumber(20, false),
+                  _buildDayNumber(21, false),
+                  _buildDayNumber(22, false),
+                ],
+              ),
+            ],
+          ),
+        ),
+        // Timeline
+        Expanded(
+          child: _buildTimeline(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeekDayLabel(String day) {
+    return SizedBox(
+      width: 40,
+      child: Text(
+        day,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDayNumber(int day, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedDay = day;
+        });
+      },
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            day.toString(),
+            style: TextStyle(
+              color: isSelected ? const Color(0xFFF63C00) : Colors.white,
+              fontSize: 16,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

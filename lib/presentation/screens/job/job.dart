@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/routes/route_path.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class JobScreen extends StatefulWidget {
@@ -235,15 +237,23 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'See details',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-              const Icon(Icons.chevron_right, size: 20),
-            ],
+          GestureDetector(
+            onTap: () {
+              context.pushNamed(
+                RoutePath.jobDetails,
+                queryParameters: {'jobId': jobNumber},
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'See details',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                const Icon(Icons.chevron_right, size: 20),
+              ],
+            ),
           ),
         ],
       ),

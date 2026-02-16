@@ -11,6 +11,19 @@ import '../../presentation/screens/authentication/sign_up_otp.dart';
 import '../../presentation/screens/splash/splash.dart';
 import '../../presentation/widgets/custom_navigation/main_navigation.dart';
 import '../../presentation/screens/notification/notification.dart';
+import '../../presentation/screens/job/job_details.dart';
+import '../../presentation/screens/job/seafty_check.dart';
+import '../../presentation/screens/vehicle/inspection.dart';
+import '../../presentation/screens/vehicle/inspection_history.dart';
+import '../../presentation/screens/profile/certifiction.dart';
+import '../../presentation/screens/profile/add_cirtification.dart';
+import '../../presentation/screens/profile/Report_issue.dart';
+import '../../presentation/screens/support/faqs.dart';
+import '../../presentation/screens/support/contact_support.dart';
+import '../../presentation/screens/support/privacy_policy.dart';
+import '../../presentation/screens/support/T&C.dart';
+import '../../presentation/screens/profile_setup_screen/profile_setup.dart';
+import '../../presentation/screens/profile_setup_screen/work_details.dart';
 import 'route_observer.dart';
 import 'route_path.dart';
 
@@ -97,6 +110,88 @@ class AppRouter {
         name: RoutePath.notification,
         path: RoutePath.notification.addBasePath,
         builder: (context, state) => const NotificationScreen(),
+      ),
+
+      // ================== Job ==================
+      GoRoute(
+        name: RoutePath.jobDetails,
+        path: RoutePath.jobDetails.addBasePath,
+        builder: (context, state) {
+          final jobId = state.uri.queryParameters['jobId'] ?? '';
+          return JobDetailsScreen(jobId: jobId);
+        },
+      ),
+      GoRoute(
+        name: RoutePath.safetyCheck,
+        path: RoutePath.safetyCheck.addBasePath,
+        builder: (context, state) {
+          final jobId = state.uri.queryParameters['jobId'] ?? '';
+          final address = state.uri.queryParameters['address'] ?? '';
+          return SafetyCheckScreen(jobId: jobId, address: address);
+        },
+      ),
+
+      // ================== Vehicle ==================
+      GoRoute(
+        name: RoutePath.inspection,
+        path: RoutePath.inspection.addBasePath,
+        builder: (context, state) => const InspectionScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.inspectionHistory,
+        path: RoutePath.inspectionHistory.addBasePath,
+        builder: (context, state) => const InspectionHistoryScreen(),
+      ),
+
+      // ================== Profile ==================
+      GoRoute(
+        name: RoutePath.certification,
+        path: RoutePath.certification.addBasePath,
+        builder: (context, state) => const CertificationScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.addCertification,
+        path: RoutePath.addCertification.addBasePath,
+        builder: (context, state) => const AddCertificationScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.reportIssue,
+        path: RoutePath.reportIssue.addBasePath,
+        builder: (context, state) => const ReportIssueScreen(),
+      ),
+
+      // ================== Support ==================
+      GoRoute(
+        name: RoutePath.faqs,
+        path: RoutePath.faqs.addBasePath,
+        builder: (context, state) => const FaqsScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.contactSupport,
+        path: RoutePath.contactSupport.addBasePath,
+        builder: (context, state) => const ContactSupportScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.privacyPolicy,
+        path: RoutePath.privacyPolicy.addBasePath,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.termsAndConditions,
+        path: RoutePath.termsAndConditions.addBasePath,
+        builder: (context, state) => const TermsAndConditionsScreen(),
+      ),
+
+      // ================== Profile Setup ==================
+      GoRoute(
+        name: RoutePath.profileSetup,
+        path: RoutePath.profileSetup.addBasePath,
+        builder: (context, state) => const ProfileSetupScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.workDetails,
+        path: RoutePath.workDetails.addBasePath,
+        builder: (context, state) => const WorkDetailsScreen(),
       ),
 
     ],

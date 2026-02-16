@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/routes/route_path.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class VehicleScreen extends StatelessWidget {
@@ -154,7 +156,9 @@ class VehicleScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.pushNamed(RoutePath.inspection);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFF63C00),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -204,7 +208,9 @@ class VehicleScreen extends StatelessWidget {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.pushNamed(RoutePath.inspectionHistory);
+                        },
                         child: const Row(
                           children: [
                             Text(

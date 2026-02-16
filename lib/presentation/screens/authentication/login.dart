@@ -110,8 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  // Login logic - navigate to home (job screen)
-                  context.goNamed('home');
+                  // Login logic - navigate to profile setup
+                  context.goNamed('profile-setup');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5722),

@@ -74,9 +74,22 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icons/app_icon.png"
-  remove_alpha_ios: true
   min_sdk_android: 21
-  image_path_android: "assets/icons/app_icon.png"
+  remove_alpha_ios: true
+  
+  # Android specific
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+  
+  # iOS specific
+  image_path_ios: "assets/icons/app_icon.png"
+  
+  # Web specific (optional)
+  web:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    background_color: "#FFFFFF"
+    theme_color: "#F63C00"
 
 flutter:
   uses-material-design: true
