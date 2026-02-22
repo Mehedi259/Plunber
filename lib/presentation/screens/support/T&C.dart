@@ -7,7 +7,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -152,7 +152,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: const Color(0xFFF63C00)),
+            Icon(icon, size: 20, color: const Color(0xFF2563EB)),
             const SizedBox(width: 12),
             Text(
               label,

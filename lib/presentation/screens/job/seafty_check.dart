@@ -33,9 +33,9 @@ class _SafetyCheckScreenState extends State<SafetyCheckScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F5),
+        backgroundColor: const Color(0xFFF8FAFC),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -65,7 +65,7 @@ class _SafetyCheckScreenState extends State<SafetyCheckScreen> {
                   TextSpan(
                     text: 'Job ${widget.jobId}',
                     style: const TextStyle(
-                      color: Color(0xFFF63C00),
+                      color: Color(0xFF2563EB),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -150,7 +150,7 @@ class _SafetyCheckScreenState extends State<SafetyCheckScreen> {
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF63C00),
+                  backgroundColor: const Color(0xFF2563EB),
                   disabledBackgroundColor: Colors.grey[300],
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -184,7 +184,7 @@ class _SafetyCheckScreenState extends State<SafetyCheckScreen> {
             Checkbox(
               value: checked,
               onChanged: onChanged,
-              activeColor: Colors.blue,
+              activeColor: const Color(0xFF2563EB),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -223,7 +223,7 @@ class _SafetyCheckScreenState extends State<SafetyCheckScreen> {
                   _confirmationChecked = value ?? false;
                 });
               },
-              activeColor: const Color(0xFFF63C00),
+              activeColor: const Color(0xFF2563EB),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -294,7 +294,7 @@ class _SafetyCheckScreenState extends State<SafetyCheckScreen> {
                     context.pop();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF63C00),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

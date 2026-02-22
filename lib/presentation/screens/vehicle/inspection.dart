@@ -33,7 +33,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -94,7 +94,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
                           child: Container(
                             height: 8,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF63C00),
+                              color: const Color(0xFF2563EB),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -121,17 +121,17 @@ class _InspectionScreenState extends State<InspectionScreen> {
                         },
                         icon: Icon(
                           _isPaused ? Icons.play_arrow : Icons.pause,
-                          color: const Color(0xFFF63C00),
+                          color: const Color(0xFF2563EB),
                         ),
                         label: Text(
                           _isPaused ? 'Resume Inspection' : 'Pause Inspection',
                           style: const TextStyle(
-                            color: Color(0xFFF63C00),
+                            color: Color(0xFF2563EB),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFFF63C00)),
+                          side: const BorderSide(color: Color(0xFF2563EB)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -160,7 +160,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
                     _showSubmitDialog(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF63C00),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -300,15 +300,15 @@ class _InspectionScreenState extends State<InspectionScreen> {
                           onPressed: () {},
                           icon: const Icon(
                             Icons.add_a_photo,
-                            color: Color(0xFFF63C00),
+                            color: Color(0xFF2563EB),
                             size: 18,
                           ),
                           label: const Text(
                             'Add Photo',
-                            style: TextStyle(color: Color(0xFFF63C00)),
+                            style: TextStyle(color: Color(0xFF2563EB)),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFF63C00)),
+                            side: const BorderSide(color: Color(0xFF2563EB)),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -326,7 +326,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -354,7 +354,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFF63C00) : Colors.grey[200],
+          color: isSelected ? const Color(0xFF2563EB) : Colors.grey[200],
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -418,7 +418,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
                     context.pop();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF63C00),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

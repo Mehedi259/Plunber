@@ -56,7 +56,7 @@
 //           gradient: const LinearGradient(
 //             begin: Alignment(0.51, -0.08),
 //             end: Alignment(0.52, 1.94),
-//             colors: [Color(0xFFF63C00), Colors.white],
+//             colors: [Color(0xFF2563EB), Colors.white],
 //           ),
 //           shape: RoundedRectangleBorder(
 //             side: const BorderSide(
@@ -130,14 +130,14 @@
 //                   _activeIcons[index],
 //                   width: 24.0 * scale,
 //                   height: 24.0 * scale,
-//                   color: const Color(0xFFF63C00),
+//                   color: const Color(0xFF2563EB),
 //                 ),
 //                 SizedBox(height: 3.0 * scale),
 //                 Text(
 //                   _labels[index],
 //                   textAlign: TextAlign.center,
 //                   style: TextStyle(
-//                     color: const Color(0xFFF63C00),
+//                     color: const Color(0xFF2563EB),
 //                     fontSize: 12.0 * scale,
 //                     fontFamily: 'Inter',
 //                     fontWeight: FontWeight.w400,

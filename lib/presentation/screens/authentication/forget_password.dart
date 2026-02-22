@@ -15,7 +15,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -23,13 +23,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              const Text(
-                'PlumberS',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFFF5722),
+              Center(
+                child: Image.asset(
+                  'assets/images/app_banner.png',
+                  width: 200,
                 ),
               ),
               const SizedBox(height: 60),
@@ -50,7 +47,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     TextSpan(
                       text: 'account recovery',
-                      style: TextStyle(color: Color(0xFF2196F3)),
+                      style: TextStyle(color: Color(0xFF2563EB)),
                     ),
                     TextSpan(text: '.'),
                   ],
@@ -98,7 +95,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                           child: const Text(
                             'Terms of Use',
-                            style: TextStyle(color: Color(0xFF2196F3)),
+                            style: TextStyle(color: Color(0xFF2563EB)),
                           ),
                         ),
                         const Text(' and '),
@@ -111,7 +108,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                           child: const Text(
                             'Privacy Policy',
-                            style: TextStyle(color: Color(0xFF2196F3)),
+                            style: TextStyle(color: Color(0xFF2563EB)),
                           ),
                         ),
                         const Text('.'),
@@ -131,7 +128,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5722),
+                        backgroundColor: const Color(0xFF2563EB),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -151,7 +148,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       },
                       child: const Text(
                         'Return to login',
-                        style: TextStyle(color: Color(0xFF2196F3)),
+                        style: TextStyle(color: Color(0xFF2563EB)),
                       ),
                     ),
                   ),

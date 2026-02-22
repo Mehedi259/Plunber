@@ -29,7 +29,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -40,13 +40,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               children: [
                 const SizedBox(height: 40),
                 // Logo
-                const Text(
-                  'PlumberS',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFF63C00),
+                Center(
+                  child: Image.asset(
+                    'assets/images/app_banner.png',
+                    width: 200,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -219,7 +216,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF63C00),
+                      backgroundColor: const Color(0xFF2563EB),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),

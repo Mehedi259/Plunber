@@ -8,7 +8,7 @@ class CertificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -110,7 +110,7 @@ class CertificationScreen extends StatelessWidget {
                 child: const Text(
                   'Certification & Licenses',
                   style: TextStyle(
-                    color: Color(0xFFF63C00),
+                    color: Color(0xFF2563EB),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -152,7 +152,7 @@ class CertificationScreen extends StatelessWidget {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF63C00),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -215,7 +215,7 @@ class CertificationScreen extends StatelessWidget {
                   expiryDate,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFFF63C00),
+                    color: Color(0xFF2563EB),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -247,7 +247,7 @@ class CertificationScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 11),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF63C00),
+                  backgroundColor: const Color(0xFF2563EB),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   shape: RoundedRectangleBorder(

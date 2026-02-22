@@ -27,7 +27,7 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -38,13 +38,10 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
               children: [
                 const SizedBox(height: 40),
                 // Logo
-                const Text(
-                  'PlumberS',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFF63C00),
+                Center(
+                  child: Image.asset(
+                    'assets/images/app_banner.png',
+                    width: 200,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -245,7 +242,7 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
                           _agreeToSafety = value ?? false;
                         });
                       },
-                      activeColor: const Color(0xFFF63C00),
+                      activeColor: const Color(0xFF2563EB),
                     ),
                     const Expanded(
                       child: Padding(
@@ -276,7 +273,7 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF63C00),
+                      backgroundColor: const Color(0xFF2563EB),
                       disabledBackgroundColor: Colors.grey[300],
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -308,9 +305,9 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.white,
+          color: isSelected ? const Color(0xFF2563EB) : Colors.white,
           border: Border.all(
-            color: isSelected ? Colors.blue : Colors.grey[300]!,
+            color: isSelected ? const Color(0xFF2563EB) : Colors.grey[300]!,
           ),
           borderRadius: BorderRadius.circular(8),
         ),

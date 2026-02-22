@@ -10,7 +10,7 @@ class JobDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -29,7 +29,7 @@ class JobDetailsScreen extends StatelessWidget {
               Text(
                 'Job $jobId',
                 style: const TextStyle(
-                  color: Color(0xFFF63C00),
+                  color: Color(0xFF2563EB),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -49,7 +49,7 @@ class JobDetailsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF63C00),
+                  color: const Color(0xFF2563EB),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Row(
@@ -85,21 +85,21 @@ class JobDetailsScreen extends StatelessWidget {
                   Icons.location_on_outlined,
                   'Address',
                   '123 Elm St, Downtown',
-                  const Color(0xFFF63C00),
+                  const Color(0xFF2563EB),
                 ),
                 const Divider(height: 24),
                 _buildInfoRow(
                   Icons.access_time,
                   'Scheduled Time',
                   '8:00 AM',
-                  const Color(0xFFF63C00),
+                  const Color(0xFF2563EB),
                 ),
                 const Divider(height: 24),
                 _buildInfoRow(
                   Icons.local_shipping_outlined,
                   'Vehicle: Truck 12',
                   'Vehicle no: ABC-1234',
-                  const Color(0xFFF63C00),
+                  const Color(0xFF2563EB),
                 ),
                 const Divider(height: 24),
                 _buildStatusRow(),
@@ -157,8 +157,8 @@ class JobDetailsScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundColor: Colors.blue[100],
-                      child: const Icon(Icons.person, color: Colors.blue),
+                      backgroundColor: const Color(0xFF2563EB).withOpacity(0.1),
+                      child: const Icon(Icons.person, color: Color(0xFF2563EB)),
                     ),
                     const SizedBox(width: 12),
                     const Expanded(
@@ -183,13 +183,13 @@ class JobDetailsScreen extends StatelessWidget {
                           SizedBox(height: 4),
                           Row(
                             children: [
-                              Icon(Icons.phone, size: 14, color: Colors.blue),
+                              Icon(Icons.phone, size: 14, color: Color(0xFF2563EB)),
                               SizedBox(width: 4),
                               Text(
                                 '+1 555-123-4567',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.blue,
+                                  color: Color(0xFF2563EB),
                                 ),
                               ),
                             ],
@@ -200,7 +200,7 @@ class JobDetailsScreen extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF63C00),
+                        backgroundColor: const Color(0xFF2563EB),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -278,7 +278,7 @@ class JobDetailsScreen extends StatelessWidget {
                       onPressed: () {},
                       icon: const Icon(
                         Icons.download,
-                        color: Color(0xFFF63C00),
+                        color: Color(0xFF2563EB),
                       ),
                     ),
                   ],
@@ -301,7 +301,7 @@ class JobDetailsScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF63C00),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -373,7 +373,7 @@ class JobDetailsScreen extends StatelessWidget {
   Widget _buildStatusRow() {
     return Row(
       children: [
-        const Icon(Icons.check_circle_outline, color: Color(0xFFF63C00), size: 20),
+        const Icon(Icons.check_circle_outline, color: Color(0xFF2563EB), size: 20),
         const SizedBox(width: 12),
         const Expanded(
           child: Text(

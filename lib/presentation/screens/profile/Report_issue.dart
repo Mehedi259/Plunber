@@ -24,7 +24,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -144,7 +144,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFFF63C00),
+                        color: const Color(0xFF2563EB),
                         width: 2,
                         style: BorderStyle.solid,
                       ),
@@ -160,7 +160,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                           ),
                           child: const Icon(
                             Icons.add,
-                            color: Color(0xFFF63C00),
+                            color: Color(0xFF2563EB),
                             size: 32,
                           ),
                         ),
@@ -197,7 +197,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF63C00),
+                      backgroundColor: const Color(0xFF2563EB),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -271,7 +271,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                     context.pop();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF63C00),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

@@ -28,7 +28,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: Column(
           children: [
@@ -38,13 +38,9 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'PlumberS',
-                    style: TextStyle(
-                      color: Color(0xFFF63C00),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Image.asset(
+                    'assets/images/app_banner.png',
+                    height: 40,
                   ),
                   IconButton(
                     icon: const Icon(Icons.notifications_outlined),
@@ -58,9 +54,9 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: TabBar(
                 controller: _tabController,
-                labelColor: const Color(0xFFF63C00),
+                labelColor: const Color(0xFF2563EB),
                 unselectedLabelColor: Colors.grey,
-                indicatorColor: const Color(0xFFF63C00),
+                indicatorColor: const Color(0xFF2563EB),
                 tabs: const [
                   Tab(text: 'Today'),
                   Tab(text: 'Upcoming'),
@@ -73,7 +69,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF63C00),
+                color: const Color(0xFF2563EB),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Row(
@@ -176,7 +172,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
               Text(
                 'Job $jobNumber',
                 style: const TextStyle(
-                  color: Color(0xFFF63C00),
+                  color: Color(0xFF2563EB),
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -200,7 +196,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   ),
                   child: const Text('Complete'),

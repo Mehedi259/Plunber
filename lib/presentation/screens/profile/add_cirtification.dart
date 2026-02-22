@@ -30,7 +30,7 @@ class _AddCertificationScreenState extends State<AddCertificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -236,13 +236,13 @@ class _AddCertificationScreenState extends State<AddCertificationScreen> {
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.add, color: Color(0xFFF63C00)),
+                  icon: const Icon(Icons.add, color: Color(0xFF2563EB)),
                   label: const Text(
                     'Add media',
-                    style: TextStyle(color: Color(0xFFF63C00)),
+                    style: TextStyle(color: Color(0xFF2563EB)),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFF63C00)),
+                    side: const BorderSide(color: Color(0xFF2563EB)),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -261,7 +261,7 @@ class _AddCertificationScreenState extends State<AddCertificationScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF63C00),
+                      backgroundColor: const Color(0xFF2563EB),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),

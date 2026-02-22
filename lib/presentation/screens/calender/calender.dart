@@ -27,7 +27,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: Column(
           children: [
@@ -55,9 +55,9 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
             // Tabs
             TabBar(
               controller: _tabController,
-              labelColor: const Color(0xFFF63C00),
+              labelColor: const Color(0xFF2563EB),
               unselectedLabelColor: Colors.grey,
-              indicatorColor: const Color(0xFFF63C00),
+              indicatorColor: const Color(0xFF2563EB),
               tabs: const [
                 Tab(text: 'Today'),
                 Tab(text: 'Tomorrow'),
@@ -155,14 +155,14 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
               width: 12,
               height: 12,
               decoration: const BoxDecoration(
-                color: Color(0xFFF63C00),
+                color: Color(0xFF2563EB),
                 shape: BoxShape.circle,
               ),
             ),
             Container(
               width: 2,
               height: 140,
-              color: const Color(0xFFF63C00),
+              color: const Color(0xFF2563EB),
             ),
           ],
         ),
@@ -182,7 +182,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                 Text(
                   'Job $jobNumber',
                   style: const TextStyle(
-                    color: Color(0xFFF63C00),
+                    color: Color(0xFF2563EB),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -331,7 +331,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
           child: Text(
             day.toString(),
             style: TextStyle(
-              color: isSelected ? const Color(0xFFF63C00) : Colors.white,
+              color: isSelected ? const Color(0xFF2563EB) : Colors.white,
               fontSize: 16,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),

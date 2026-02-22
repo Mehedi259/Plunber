@@ -9,7 +9,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -105,7 +105,7 @@ class ProfileScreen extends StatelessWidget {
                           'Edit',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFFF63C00),
+                            color: Color(0xFF2563EB),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -146,7 +146,7 @@ class ProfileScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF63C00),
+                  backgroundColor: const Color(0xFF2563EB),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -199,7 +199,7 @@ class ProfileScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5),
+            color: const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: Colors.black54, size: 24),

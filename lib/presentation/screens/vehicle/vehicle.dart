@@ -9,7 +9,7 @@ class VehicleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -98,12 +98,12 @@ class VehicleScreen extends StatelessWidget {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.warning_amber_outlined, size: 16, color: Color(0xFFF63C00)),
+                        Icon(Icons.warning_amber_outlined, size: 16, color: Color(0xFF2563EB)),
                         SizedBox(width: 4),
                         Text(
                           'Inspection Required',
                           style: TextStyle(
-                            color: Color(0xFFF63C00),
+                            color: Color(0xFF2563EB),
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -115,7 +115,7 @@ class VehicleScreen extends StatelessWidget {
                   // Last Inspection
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today_outlined, size: 20, color: Color(0xFFF63C00)),
+                      const Icon(Icons.calendar_today_outlined, size: 20, color: Color(0xFF2563EB)),
                       const SizedBox(width: 8),
                       const Text(
                         'Last Inspection: ',
@@ -160,7 +160,7 @@ class VehicleScreen extends StatelessWidget {
                         context.pushNamed(RoutePath.inspection);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF63C00),
+                        backgroundColor: const Color(0xFF2563EB),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -216,13 +216,13 @@ class VehicleScreen extends StatelessWidget {
                             Text(
                               'View All',
                               style: TextStyle(
-                                color: Color(0xFFF63C00),
+                                color: Color(0xFF2563EB),
                                 fontSize: 14,
                               ),
                             ),
                             Icon(
                               Icons.chevron_right,
-                              color: Color(0xFFF63C00),
+                              color: Color(0xFF2563EB),
                               size: 20,
                             ),
                           ],
