@@ -1,4 +1,4 @@
-package com.example.plumber
+package com.example.adelaide
 
 import io.flutter.embedding.android.FlutterActivity
 

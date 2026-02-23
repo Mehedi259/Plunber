@@ -148,7 +148,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _buildDropdownField(_selectedRole, ['Select role', 'Plumber', 'Electrician', 'Technician']),
+                _buildDropdownField(_selectedRole, ['Select role', 'Plumber', 'Electrician', 'Technician'], true),
                 const SizedBox(height: 24),
 
                 // Primary Skill
@@ -160,7 +160,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _buildDropdownField(_selectedSkill, ['Select skill', 'Plumbing', 'Pipe Fitting', 'Leak Repair', 'Installation']),
+                _buildDropdownField(_selectedSkill, ['Select skill', 'Plumbing', 'Pipe Fitting', 'Leak Repair', 'Installation'], false),
                 const SizedBox(height: 24),
 
                 // Employee ID
@@ -241,7 +241,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     );
   }
 
-  Widget _buildDropdownField(String value, List<String> items) {
+  Widget _buildDropdownField(String value, List<String> items, bool isRole) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
@@ -268,7 +268,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           }).toList(),
           onChanged: (String? newValue) {
             setState(() {
-              if (items == ['Select role', 'Plumber', 'Electrician', 'Technician']) {
+              if (isRole) {
                 _selectedRole = newValue!;
               } else {
                 _selectedSkill = newValue!;

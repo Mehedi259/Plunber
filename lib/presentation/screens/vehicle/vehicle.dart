@@ -103,20 +103,23 @@ class VehicleScreen extends StatelessWidget {
             AnimatedSection(
               index: 5,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 76),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF323232)),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Last Inspection: January 15, 2026',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF323232),
-                        fontSize: 14,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
+                    Flexible(
+                      child: const Text(
+                        'Last Inspection: January 15, 2026',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF323232),
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -128,20 +131,23 @@ class VehicleScreen extends StatelessWidget {
             AnimatedSection(
               index: 6,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 74),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.build_outlined, size: 16, color: Color(0xFF323232)),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Next Service: 2,000 km remaining',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF323232),
-                        fontSize: 14,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
+                    Flexible(
+                      child: const Text(
+                        'Next Service: 2,000 km remaining',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF323232),
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

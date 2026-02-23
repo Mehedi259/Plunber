@@ -200,13 +200,16 @@ class StartJobScreen extends StatelessWidget {
                             children: [
                               Icon(Icons.phone, size: 16, color: Color(0xFF105DBE)),
                               SizedBox(width: 4),
-                              Text(
-                                '+1 555-123-4567',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF105DBE),
+                              Flexible(
+                                child: Text(
+                                  '+1 555-123-4567',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF105DBE),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
