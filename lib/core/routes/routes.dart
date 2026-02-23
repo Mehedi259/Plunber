@@ -12,7 +12,9 @@ import '../../presentation/screens/splash/splash.dart';
 import '../../presentation/widgets/custom_navigation/main_navigation.dart';
 import '../../presentation/screens/notification/notification.dart';
 import '../../presentation/screens/job/job_details.dart';
-import '../../presentation/screens/job/seafty_check.dart';
+import '../../presentation/screens/job/seafty_check_required.dart';
+import '../../presentation/screens/job/start_job.dart';
+import '../../presentation/screens/job/problem_submit.dart';
 import '../../presentation/screens/vehicle/inspection.dart';
 import '../../presentation/screens/vehicle/inspection_history.dart';
 import '../../presentation/screens/profile/certifiction.dart';
@@ -127,7 +129,23 @@ class AppRouter {
         builder: (context, state) {
           final jobId = state.uri.queryParameters['jobId'] ?? '';
           final address = state.uri.queryParameters['address'] ?? '';
-          return SafetyCheckScreen(jobId: jobId, address: address);
+          return SafetyCheckRequiredScreen(jobId: jobId, address: address);
+        },
+      ),
+      GoRoute(
+        name: RoutePath.startJob,
+        path: RoutePath.startJob.addBasePath,
+        builder: (context, state) {
+          final jobId = state.uri.queryParameters['jobId'] ?? '';
+          return StartJobScreen(jobId: jobId);
+        },
+      ),
+      GoRoute(
+        name: RoutePath.problemSubmit,
+        path: RoutePath.problemSubmit.addBasePath,
+        builder: (context, state) {
+          final jobId = state.uri.queryParameters['jobId'] ?? '';
+          return ProblemSubmitScreen(jobId: jobId);
         },
       ),
 

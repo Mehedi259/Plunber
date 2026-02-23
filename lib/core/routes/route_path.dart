@@ -18,6 +18,8 @@ class RoutePath {
   static const String home = 'home';
   static const String jobDetails = 'job-details';
   static const String safetyCheck = 'safety-check';
+  static const String startJob = 'start-job';
+  static const String problemSubmit = 'problem-submit';
 
   //==================================== Profile Setup screens =====================================
   static const String profileSetup = 'profile-setup';

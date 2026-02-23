@@ -129,28 +129,39 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> with TickerProvider
               // Safety Check Required Banner
               _buildAnimatedSection(
                 1,
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2563EB),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.info_outline, color: Colors.white, size: 20),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Safety Check Required',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.80),
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
-                          height: 1.05,
+                GestureDetector(
+                  onTap: () {
+                    context.pushNamed(
+                      RoutePath.safetyCheck,
+                      queryParameters: {
+                        'jobId': widget.jobId,
+                        'address': '45 Maple Street',
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2563EB),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.info_outline, color: Colors.white, size: 20),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Safety Check Required',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.80),
+                            fontSize: 14,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400,
+                            height: 1.05,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -485,7 +496,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> with TickerProvider
                   child: ElevatedButton(
                     onPressed: () {
                       context.pushNamed(
-                        RoutePath.safetyCheck,
+                        RoutePath.startJob,
                         queryParameters: {
                           'jobId': widget.jobId,
                           'address': '45 Maple Street',
