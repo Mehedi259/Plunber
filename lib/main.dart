@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       builder: (_, __) {
         return GetMaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: "Plumber",
+          title: "Adelaide",
 
           routeInformationParser: AppRouter.route.routeInformationParser,
           routerDelegate: AppRouter.route.routerDelegate,

@@ -39,7 +39,7 @@ class _AddCertificationScreenState extends State<AddCertificationScreen> {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'Add Certification',
+          'Add Documents',
           style: TextStyle(
             color: Colors.black,
             fontSize: 18,

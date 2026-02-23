@@ -36,19 +36,13 @@ class VehicleScreen extends StatelessWidget {
             AnimatedSection(
               index: 1,
               child: Container(
-                height: 266,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/Truck.png',
-                    width: 266,
-                    height: 180,
-                    fit: BoxFit.contain,
-                  ),
+                height: 181,
+                margin: const EdgeInsets.symmetric(horizontal: 68),
+                child: Image.asset(
+                  'assets/images/Truck.png',
+                  width: 266,
+                  height: 181,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
@@ -76,133 +70,131 @@ class VehicleScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            // Inspection Status Card
+            const SizedBox(height: 32),
+            // Inspection Required Badge
             AnimatedSection(
               index: 4,
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  color: const Color(0xFF1E40AF),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Column(
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Inspection Required Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFE5E5),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.warning_amber_outlined, size: 16, color: Color(0xFF2563EB)),
-                          SizedBox(width: 4),
-                          Text(
-                            'Inspection Required',
-                            style: TextStyle(
-                              color: Color(0xFF2563EB),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Last Inspection
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_today_outlined, size: 20, color: Color(0xFF2563EB)),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Last Inspection: ',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Text(
-                          'January 15, 2026',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // Next Service
-                    Row(
-                      children: [
-                        const Icon(Icons.build_outlined, size: 20, color: Colors.black54),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Next Service: ',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Text(
-                          '2,000 km remaining',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Start Inspection Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.pushNamed(RoutePath.inspection);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2563EB),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          'Start Inspection',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                    Icon(Icons.info_outline, size: 16, color: Colors.white),
+                    SizedBox(width: 4),
+                    Text(
+                      'Inspection Required',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            // Inspection History
+            const SizedBox(height: 16),
+            // Last Inspection
             AnimatedSection(
               index: 5,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 76),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF323232)),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Last Inspection: January 15, 2026',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF323232),
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Next Service
+            AnimatedSection(
+              index: 6,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 74),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.build_outlined, size: 16, color: Color(0xFF323232)),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Next Service: 2,000 km remaining',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF323232),
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Start Inspection Button
+            AnimatedSection(
+              index: 7,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 47),
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.pushNamed(RoutePath.inspection);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Start Inspection',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 40),
+            // Inspection History
+            AnimatedSection(
+              index: 8,
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                      spreadRadius: 0,
                     ),
                   ],
                 ),
@@ -214,38 +206,48 @@ class VehicleScreen extends StatelessWidget {
                         const Text(
                           'Inspection History',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF323232),
+                            fontSize: 18,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         TextButton(
                           onPressed: () {
                             context.pushNamed(RoutePath.inspectionHistory);
                           },
-                          child: const Row(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Row(
                             children: [
-                              Text(
+                              const Text(
                                 'View All',
                                 style: TextStyle(
                                   color: Color(0xFF2563EB),
                                   fontSize: 14,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              Icon(
-                                Icons.chevron_right,
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.arrow_forward_ios,
                                 color: Color(0xFF2563EB),
-                                size: 20,
+                                size: 14,
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const Divider(),
+                    const SizedBox(height: 20),
                     _buildHistoryItem('Jan 10', 'Complete', true),
-                    const Divider(),
+                    const SizedBox(height: 12),
                     _buildHistoryItem('Jan 20', 'Issue Reported', false),
-                    const Divider(),
+                    const SizedBox(height: 12),
                     _buildHistoryItem('Feb 8', 'Complete', true),
                   ],
                 ),
@@ -260,36 +262,80 @@ class VehicleScreen extends StatelessWidget {
   }
 
   Widget _buildHistoryItem(String date, String status, bool isComplete) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
+      ),
       child: Row(
         children: [
-          SizedBox(
-            width: 60,
+          // Date Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFFE5E7EB),
+                width: 1,
+              ),
+            ),
             child: Text(
               date,
               style: const TextStyle(
+                color: Color(0xFF323232),
                 fontSize: 14,
+                fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: isComplete ? Colors.green : Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 16),
+          // Status with Icon
           Expanded(
-            child: Text(
-              status,
-              style: const TextStyle(fontSize: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: isComplete ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                      color: isComplete ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const Icon(Icons.chevron_right, size: 20),
+          // Arrow Icon
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5E7EB),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: Color(0xFF6B7280),
+            ),
+          ),
         ],
       ),
     );

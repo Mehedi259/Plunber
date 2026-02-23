@@ -1,5 +1,5 @@
-name: plumber
-description: "Plubber service"
+name: adelaide
+description: "Adelaide Plumber Service"
 publish_to: none
 
 version: 1.0.0+1
