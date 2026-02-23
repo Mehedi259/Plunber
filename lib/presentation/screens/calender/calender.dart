@@ -76,37 +76,17 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
             // Header
             AnimatedSection(
               index: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Calendar',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+              child: const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(
+                  child: Text(
+                    'Calendar',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF2F5FA),
-                        border: Border.all(
-                          color: const Color(0x0C323232),
-                          width: 1,
-                        ),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.notifications_outlined, size: 24),
-                        onPressed: () {},
-                        padding: EdgeInsets.zero,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

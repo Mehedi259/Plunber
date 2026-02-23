@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/routes/route_path.dart';
-import '../../widgets/custom_navigation/custom_navbar.dart';
 import '../../widgets/animated_section.dart';
 
 class VehicleScreen extends StatelessWidget {
@@ -18,24 +17,17 @@ class VehicleScreen extends StatelessWidget {
               // Header
               AnimatedSection(
                 index: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Vehicle',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+                child: const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Text(
+                      'Vehicle',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.notifications_outlined),
-                        onPressed: () {},
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
