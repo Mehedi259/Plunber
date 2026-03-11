@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../global/controler/profile/profile_setup_controller.dart';
 
 class WorkDetailsScreen extends StatefulWidget {
   const WorkDetailsScreen({Key? key}) : super(key: key);
@@ -13,9 +17,13 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _licenseNumberController = TextEditingController();
   final _expiryDateController = TextEditingController();
+  final _profileSetupController = Get.find<ProfileSetupController>();
   
   bool _useCompanyVehicle = false;
   bool _agreeToSafety = false;
+  File? _licenseFile;
+  String? _licenseFileName;
+  DateTime? _selectedDate;
 
   @override
   void dispose() {
@@ -160,6 +168,7 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
                     );
                     if (date != null) {
                       setState(() {
+                        _selectedDate = date;
                         _expiryDateController.text =
                             '${date.month.toString().padLeft(2, '0')} / ${date.day.toString().padLeft(2, '0')} / ${date.year}';
                       });
@@ -199,9 +208,7 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
                 ),
                 const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () {
-                    // Handle file upload
-                  },
+                  onTap: _pickFile,
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -211,18 +218,19 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'Upload documents',
+                            _licenseFileName ?? 'Upload documents',
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: _licenseFileName != null ? Colors.black87 : Colors.grey,
                               fontSize: 14,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Icon(
-                          Icons.attach_file,
-                          color: Colors.grey[600],
+                          _licenseFileName != null ? Icons.check_circle : Icons.attach_file,
+                          color: _licenseFileName != null ? Colors.green : Colors.grey[600],
                           size: 20,
                         ),
                       ],
@@ -261,35 +269,41 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
                 const SizedBox(height: 32),
 
                 // Finish & Start Work Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _agreeToSafety
-                        ? () {
-                            if (_formKey.currentState!.validate()) {
-                              // Navigate to home (job screen)
-                              context.goNamed(RoutePath.home);
-                            }
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      disabledBackgroundColor: Colors.grey[300],
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                Obx(() {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: (_agreeToSafety && !_profileSetupController.isLoading.value)
+                          ? _handleFinish
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        disabledBackgroundColor: Colors.grey[300],
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
+                      child: _profileSetupController.isLoading.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              'Finish & Start Work',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: _agreeToSafety ? Colors.white : Colors.grey[600],
+                              ),
+                            ),
                     ),
-                    child: Text(
-                      'Finish & Start Work',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: _agreeToSafety ? Colors.white : Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                ),
+                  );
+                }),
                 const SizedBox(height: 16),
               ],
             ),
@@ -322,5 +336,80 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        setState(() {
+          _licenseFile = File(result.files.single.path!);
+          _licenseFileName = result.files.single.name;
+        });
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to pick file: ${e.toString()}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+  }
+
+  Future<void> _handleFinish() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_selectedDate == null) {
+      Get.snackbar(
+        'Error',
+        'Please select license expiry date',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    // Format date as YYYY-MM-DD for API
+    final formattedDate = '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+
+    final success = await _profileSetupController.updateProfileStep2(
+      usesCompanyVehicle: _useCompanyVehicle,
+      driversLicenseNumber: _licenseNumberController.text.trim(),
+      licenseExpiryDate: formattedDate,
+      driversLicenseFile: _licenseFile,
+    );
+
+    if (success) {
+      Get.snackbar(
+        'Success',
+        'Work details updated successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          context.goNamed(RoutePath.home);
+        }
+      });
+    } else {
+      Get.snackbar(
+        'Error',
+        _profileSetupController.errorMessage.value,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    }
   }
 }

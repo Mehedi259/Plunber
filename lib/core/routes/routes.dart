@@ -153,7 +153,16 @@ class AppRouter {
       GoRoute(
         name: RoutePath.inspection,
         path: RoutePath.inspection.addBasePath,
-        builder: (context, state) => const InspectionScreen(),
+        builder: (context, state) {
+          final vehicleId = state.uri.queryParameters['vehicleId'] ?? '';
+          final vehicleName = state.uri.queryParameters['vehicleName'] ?? '';
+          final vehiclePlate = state.uri.queryParameters['vehiclePlate'] ?? '';
+          return InspectionScreen(
+            vehicleId: vehicleId,
+            vehicleName: vehicleName,
+            vehiclePlate: vehiclePlate,
+          );
+        },
       ),
       GoRoute(
         name: RoutePath.inspectionHistory,

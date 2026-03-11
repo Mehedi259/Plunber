@@ -34,11 +34,11 @@ class _MainNavigationState extends State<MainNavigation> {
     super.dispose();
   }
 
-  final List<Widget> _screens = const [
-    JobScreen(),
-    CalendarScreen(),
-    VehicleScreen(),
-    ProfileScreen(),
+  final List<Widget> _screens = [
+    const JobScreen(),
+    const CalendarScreen(),
+    VehicleScreen(vehicleId: 'default-vehicle-id'), // TODO: Get from user's assigned vehicle
+    const ProfileScreen(),
   ];
 
   @override

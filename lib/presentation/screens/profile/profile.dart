@@ -1,228 +1,308 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import '../../../core/routes/route_path.dart';
 import '../../widgets/animated_section.dart';
+import '../../../global/controler/profile/employee_profile_controller.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _profileController = Get.put(EmployeeProfileController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header
-              AnimatedSection(
-                index: 0,
-                child: const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Text(
-                      'Profile',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+        child: Obx(() {
+          if (_profileController.isLoading.value && _profileController.profile.value == null) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF2563EB),
               ),
-            const SizedBox(height: 20),
-            // Profile Card
-            AnimatedSection(
-              index: 1,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // Profile Image
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey[300],
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/profile.png',
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
+            );
+          }
+
+          if (_profileController.errorMessage.value.isNotEmpty && _profileController.profile.value == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _profileController.errorMessage.value,
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => _profileController.fetchProfile(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final profile = _profileController.profile.value;
+          if (profile == null) {
+            return const Center(
+              child: Text('No profile data available'),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => _profileController.refreshProfile(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  // Header
+                  AnimatedSection(
+                    index: 0,
+                    child: const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Text(
+                          'Profile',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    // Profile Info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  const SizedBox(height: 20),
+                  // Profile Card
+                  AnimatedSection(
+                    index: 1,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
                         children: [
-                          const Text(
-                            'John Smithy',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          // Profile Image
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.grey[300],
+                            child: ClipOval(
+                              child: profile.profilePicture != null
+                                  ? Image.network(
+                                      profile.profilePicture!,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/profile.png',
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
+                                  : Image.asset(
+                                      'assets/images/profile.png',
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Plumber',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Mobile No: +1 234 567 8900',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'ID: #12345',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Edit',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF2563EB),
-                              fontWeight: FontWeight.w600,
+                          const SizedBox(width: 16),
+                          // Profile Info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  profile.fullName,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  profile.profession,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Mobile No: ${profile.phone}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'ID: ${profile.employeeId}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                GestureDetector(
+                                  onTap: () {
+                                    // Navigate to edit profile
+                                    // context.pushNamed(RoutePath.editProfile);
+                                  },
+                                  child: const Text(
+                                    'Edit',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF2563EB),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Menu Items
-            AnimatedSection(
-              index: 2,
-              child: _buildMenuItem(
-                icon: Icons.verified_user_outlined,
-                title: 'Certification & Skills',
-                onTap: () {
-                  context.pushNamed(RoutePath.certification);
-                },
-              ),
-            ),
-            AnimatedSection(
-              index: 3,
-              child: _buildMenuItem(
-                icon: Icons.headset_mic_outlined,
-                title: 'Support & Help',
-                onTap: () {
-                  _showSupportMenu(context);
-                },
-              ),
-            ),
-            AnimatedSection(
-              index: 4,
-              child: _buildMenuItem(
-                icon: Icons.report_problem_outlined,
-                title: 'Report an Issue',
-                onTap: () {
-                  context.pushNamed(RoutePath.reportIssue);
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Logout Button
-            AnimatedSection(
-              index: 5,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  ),
+                  const SizedBox(height: 20),
+                  // Menu Items
+                  AnimatedSection(
+                    index: 2,
+                    child: _buildMenuItem(
+                      icon: Icons.verified_user_outlined,
+                      title: 'Certification & Skills',
+                      onTap: () {
+                        context.pushNamed(RoutePath.certification);
+                      },
                     ),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Logout',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(Icons.logout, color: Colors.white, size: 20),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Delete Account Button
-            AnimatedSection(
-              index: 6,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    _showDeleteConfirmation(context);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: const BorderSide(color: Colors.red, width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  AnimatedSection(
+                    index: 3,
+                    child: _buildMenuItem(
+                      icon: Icons.headset_mic_outlined,
+                      title: 'Support & Help',
+                      onTap: () {
+                        _showSupportMenu(context);
+                      },
                     ),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Delete Account',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
+                  AnimatedSection(
+                    index: 4,
+                    child: _buildMenuItem(
+                      icon: Icons.report_problem_outlined,
+                      title: 'Report an Issue',
+                      onTap: () {
+                        context.pushNamed(RoutePath.reportIssue);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Logout Button
+                  AnimatedSection(
+                    index: 5,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _profileController.isLoading.value ? null : _handleLogout,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: _profileController.isLoading.value
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Logout',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.logout, color: Colors.white, size: 20),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Delete Account Button
+                  AnimatedSection(
+                    index: 6,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: _profileController.isLoading.value ? null : () {
+                          _showDeleteConfirmation(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: const BorderSide(color: Colors.red, width: 1.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Delete Account',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                          ],
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 100),
+                ],
               ),
             ),
-              const SizedBox(height: 100),
-            ],
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
@@ -350,9 +430,33 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
-                // Add delete account logic here
+                final success = await _profileController.deleteAccount();
+                
+                if (success) {
+                  Get.snackbar(
+                    'Success',
+                    'Account deleted successfully',
+                    backgroundColor: Colors.green,
+                    colorText: Colors.white,
+                    snackPosition: SnackPosition.TOP,
+                  );
+                  
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    if (mounted) {
+                      context.goNamed(RoutePath.login);
+                    }
+                  });
+                } else {
+                  Get.snackbar(
+                    'Error',
+                    _profileController.errorMessage.value,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                    snackPosition: SnackPosition.TOP,
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -373,6 +477,34 @@ class ProfileScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _handleLogout() async {
+    final success = await _profileController.logout();
+    
+    if (success) {
+      Get.snackbar(
+        'Success',
+        'Logged out successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+      
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          context.goNamed(RoutePath.login);
+        }
+      });
+    } else {
+      Get.snackbar(
+        'Error',
+        _profileController.errorMessage.value,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    }
   }
 
   Widget _buildSupportMenuItem(BuildContext context, String title, VoidCallback onTap) {

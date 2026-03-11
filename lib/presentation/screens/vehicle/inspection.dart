@@ -1,29 +1,41 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../global/controler/inspection/inspection_controller.dart';
+import '../../../global/service/inspection/inspection_service.dart';
 
 class InspectionScreen extends StatefulWidget {
-  const InspectionScreen({super.key});
+  final String vehicleId;
+  final String vehicleName;
+  final String vehiclePlate;
+  
+  const InspectionScreen({
+    super.key,
+    required this.vehicleId,
+    required this.vehicleName,
+    required this.vehiclePlate,
+  });
 
   @override
   State<InspectionScreen> createState() => _InspectionScreenState();
 }
 
 class _InspectionScreenState extends State<InspectionScreen> {
+  final _inspectionController = Get.put(InspectionController());
+  final _imagePicker = ImagePicker();
+  
   final Map<String, InspectionItem> _inspectionItems = {
-    'Lights': InspectionItem(
-      name: 'Lights',
-      status: false,
-      note: 'Left break light is not working properly',
-      hasPhoto: true,
-    ),
-    'Tires': InspectionItem(name: 'Tires', status: true),
-    'Breaks': InspectionItem(name: 'Breaks', status: true),
-    'Fluid Levels': InspectionItem(name: 'Fluid Levels', status: true),
-    'Mirrors': InspectionItem(name: 'Mirrors', status: true),
-    'Horn': InspectionItem(name: 'Horn', status: true),
-    'Windshield & Wipers': InspectionItem(name: 'Windshield & Wipers', status: true),
-    'Dashboard Warning Lights': InspectionItem(name: 'Dashboard Warning Lights', status: true),
-    'Body Exterior': InspectionItem(name: 'Body Exterior', status: true),
+    'lights': InspectionItem(name: 'Lights', category: 'lights', status: true),
+    'tires': InspectionItem(name: 'Tires', category: 'tires', status: true),
+    'brakes': InspectionItem(name: 'Brakes', category: 'brakes', status: true),
+    'fluid_levels': InspectionItem(name: 'Fluid Levels', category: 'fluid_levels', status: true),
+    'mirrors': InspectionItem(name: 'Mirrors', category: 'mirrors', status: true),
+    'horn': InspectionItem(name: 'Horn', category: 'horn', status: true),
+    'windshield_wipers': InspectionItem(name: 'Windshield & Wipers', category: 'windshield_wipers', status: true),
+    'dashboard_warning_lights': InspectionItem(name: 'Dashboard Warning Lights', category: 'dashboard_warning_lights', status: true),
+    'body_exterior': InspectionItem(name: 'Body Exterior', category: 'body_exterior', status: true),
   };
 
   int get completedItems => _inspectionItems.values.where((item) => item.status).length;
@@ -186,32 +198,44 @@ class _InspectionScreenState extends State<InspectionScreen> {
               const SizedBox(height: 24),
 
               // Submit Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _showSubmitDialog(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    padding: const EdgeInsets.all(8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              Obx(() {
+                return SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _inspectionController.isLoading.value ? null : () {
+                      _handleSubmit(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      disabledBackgroundColor: const Color(0xFF2563EB).withOpacity(0.6),
+                      padding: const EdgeInsets.all(8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
+                    child: _inspectionController.isLoading.value
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Submit Inspection',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
-                  child: const Text(
-                    'Submit Inspection',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
+                );
+              }),
               const SizedBox(height: 16),
             ],
           ),
@@ -330,17 +354,8 @@ class _InspectionScreenState extends State<InspectionScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _inspectionItems[key]!.hasPhoto = true;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Photo added successfully'),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Color(0xFF10B981),
-                        ),
-                      );
+                    onPressed: () async {
+                      await _pickImage(key);
                     },
                     icon: const Icon(
                       Icons.add_a_photo,
@@ -373,60 +388,67 @@ class _InspectionScreenState extends State<InspectionScreen> {
                 ),
               ],
             ),
-            if (item.hasPhoto) ...[
+            if (item.photos.isNotEmpty) ...[
               const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color(0xFFE5E7EB),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.image,
-                        size: 32,
-                        color: Color(0xFF9CA3AF),
-                      ),
+              ...item.photos.asMap().entries.map((photoEntry) {
+                final photoIndex = photoEntry.key;
+                final photo = photoEntry.value;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFE5E7EB),
+                      width: 1,
                     ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'Photo attached',
-                        style: TextStyle(
-                          color: Color(0xFF6B7280),
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w500,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            photo,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _inspectionItems[key]!.hasPhoto = false;
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.delete_outline,
-                        color: Color(0xFFEF4444),
-                        size: 20,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Photo ${photoIndex + 1}',
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontSize: 14,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _inspectionItems[key]!.photos.removeAt(photoIndex);
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFEF4444),
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ],
           ],
         ],
@@ -457,8 +479,42 @@ class _InspectionScreenState extends State<InspectionScreen> {
     );
   }
 
-  void _showSubmitDialog(BuildContext context) {
-    // Check if all items are completed or have notes for failed items
+  Future<void> _pickImage(String key) async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 80,
+      );
+
+      if (image != null) {
+        setState(() {
+          _inspectionItems[key]!.photos.add(File(image.path));
+        });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Photo added successfully'),
+              duration: Duration(seconds: 2),
+              backgroundColor: Color(0xFF10B981),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to pick image: ${e.toString()}'),
+            backgroundColor: const Color(0xFFEF4444),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleSubmit(BuildContext context) async {
+    // Validate
     bool canSubmit = true;
     String? errorMessage;
 
@@ -471,19 +527,58 @@ class _InspectionScreenState extends State<InspectionScreen> {
     }
 
     if (!canSubmit) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage!),
-          backgroundColor: const Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
+      Get.snackbar(
+        'Validation Error',
+        errorMessage!,
+        backgroundColor: const Color(0xFFEF4444),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
 
+    // Prepare data
+    final items = _inspectionItems.entries.map((entry) {
+      return InspectionCheckItem(
+        category: entry.value.category,
+        isOk: entry.value.status,
+        issueDetail: entry.value.note,
+      );
+    }).toList();
+
+    final photos = <String, List<InspectionPhoto>>{};
+    for (var entry in _inspectionItems.entries) {
+      if (entry.value.photos.isNotEmpty) {
+        photos[entry.value.category] = entry.value.photos.map((file) {
+          return InspectionPhoto(file: file);
+        }).toList();
+      }
+    }
+
+    // Submit
+    final response = await _inspectionController.submitInspection(
+      vehicleId: widget.vehicleId,
+      notes: 'Inspection completed',
+      items: items,
+      photos: photos,
+    );
+
+    if (response.success) {
+      if (mounted) {
+        _showSubmitDialog(context, response.hasOpenIssue ?? false);
+      }
+    } else {
+      Get.snackbar(
+        'Error',
+        response.message,
+        backgroundColor: const Color(0xFFEF4444),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+  }
+
+  void _showSubmitDialog(BuildContext context, bool hasOpenIssue) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -568,14 +663,16 @@ class _InspectionScreenState extends State<InspectionScreen> {
 
 class InspectionItem {
   final String name;
+  final String category;
   bool status;
   String? note;
-  bool hasPhoto;
+  List<File> photos;
 
   InspectionItem({
     required this.name,
+    required this.category,
     required this.status,
     this.note,
-    this.hasPhoto = false,
-  });
+    List<File>? photos,
+  }) : photos = photos ?? [];
 }

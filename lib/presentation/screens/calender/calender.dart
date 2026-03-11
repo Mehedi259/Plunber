@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../widgets/animated_section.dart';
+import '../../../global/controler/calendar/calendar_controller.dart';
+import '../../../global/service/job/job_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -10,6 +13,7 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _calendarController = Get.put(CalendarController());
   int _selectedDay = 19;
   int _selectedMonth = 1; // January = 1
   int _selectedYear = 2026;
@@ -115,14 +119,44 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
             ),
             // Timeline
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildTimeline(),
-                  _buildTimeline(),
-                  _buildWeekView(),
-                ],
-              ),
+              child: Obx(() {
+                if (_calendarController.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF2563EB),
+                    ),
+                  );
+                }
+
+                if (_calendarController.errorMessage.value.isNotEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _calendarController.errorMessage.value,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => _calendarController.fetchCalendarJobs(),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildTimeline(_calendarController.todayJobs),
+                    _buildTimeline(_calendarController.tomorrowJobs),
+                    _buildWeekView(),
+                  ],
+                );
+              }),
             ),
           ],
         ),
@@ -130,71 +164,43 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
     );
   }
 
-  Widget _buildTimeline() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        AnimatedSection(
-          index: 2,
-          child: _buildTimelineItem(
-            time: '8:00\nAM',
-            jobNumber: '#1023',
-            address: '123 Elm St, Downtown',
-            startTime: '8:00 AM',
-            vehicle: 'Truck 12',
-            vehicleNo: 'ABC-1234',
-            color: const Color(0xFFFFE5E5),
+  Widget _buildTimeline(List<JobData> jobs) {
+    if (jobs.isEmpty) {
+      return const Center(
+        child: Text(
+          'No jobs scheduled',
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 16,
+            fontFamily: 'Poppins',
           ),
         ),
-        AnimatedSection(
-          index: 3,
-          child: _buildTimelineItem(
-            time: '9:30\nAM',
-            jobNumber: '#1022',
-            address: '892 Maple Ave, Westfield',
-            startTime: '9:30 AM',
-            vehicle: 'Van 9',
-            vehicleNo: 'XYZ-5678',
-            color: const Color(0xFFE5F5E5),
-          ),
-        ),
-        AnimatedSection(
-          index: 4,
-          child: _buildTimelineItem(
-            time: '4:00\nPM',
-            jobNumber: '#1021',
-            address: '55 Pine Rd, Lakeside',
-            startTime: '4:00 AM',
-            vehicle: 'Van 7',
-            vehicleNo: 'XYZ-0025',
-            color: const Color(0xFFE5E5FF),
-          ),
-        ),
-        AnimatedSection(
-          index: 5,
-          child: _buildTimelineItem(
-            time: '8:30\nPM',
-            jobNumber: '#1020',
-            address: '60 Park Rd, Lakeside',
-            startTime: '8:30 PM',
-            vehicle: 'Van 5',
-            vehicleNo: 'XYZ-0725',
-            color: const Color(0xFFFFF9E5),
-          ),
-        ),
-      ],
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => _calendarController.refreshCalendar(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: jobs.length,
+        itemBuilder: (context, index) {
+          final job = jobs[index];
+          return AnimatedSection(
+            index: index + 2,
+            child: _buildTimelineItem(job),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildTimelineItem({
-    required String time,
-    required String jobNumber,
-    required String address,
-    required String startTime,
-    required String vehicle,
-    required String vehicleNo,
-    required Color color,
-  }) {
+  Widget _buildTimelineItem(JobData job) {
+    final time = job.getFormattedTime();
+    final timeLines = time.split(' ');
+    final displayTime = timeLines.length > 1 
+        ? '${timeLines[0]}\n${timeLines[1]}' 
+        : time;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -202,7 +208,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
         SizedBox(
           width: 50,
           child: Text(
-            time,
+            displayTime,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -234,14 +240,14 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: color,
+              color: job.getCardColor(),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Job $jobNumber',
+                  'Job ${job.jobId}',
                   style: const TextStyle(
                     color: Color(0xFF2563EB),
                     fontSize: 16,
@@ -255,7 +261,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        address,
+                        job.client.address,
                         style: const TextStyle(fontSize: 14),
                       ),
                     ),
@@ -266,11 +272,11 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                   children: [
                     const Icon(Icons.access_time, size: 16, color: Colors.black54),
                     const SizedBox(width: 4),
-                    Text(startTime, style: const TextStyle(fontSize: 12)),
+                    Text(job.getFormattedTime(), style: const TextStyle(fontSize: 12)),
                     const SizedBox(width: 16),
                     const Icon(Icons.local_shipping_outlined, size: 16, color: Colors.black54),
                     const SizedBox(width: 4),
-                    Text(vehicle, style: const TextStyle(fontSize: 12)),
+                    Text(job.vehicle.name, style: const TextStyle(fontSize: 12)),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -278,7 +284,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                   children: [
                     const Icon(Icons.directions_car_outlined, size: 16, color: Colors.black54),
                     const SizedBox(width: 4),
-                    Text('Vehicle no: $vehicleNo', style: const TextStyle(fontSize: 12)),
+                    Text('Vehicle no: ${job.vehicle.vehicleNumber}', style: const TextStyle(fontSize: 12)),
                   ],
                 ),
               ],
@@ -356,7 +362,10 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
         ),
         // Timeline
         Expanded(
-          child: _buildTimeline(),
+          child: Obx(() {
+            final weekJobs = _calendarController.getAllWeekJobs();
+            return _buildTimeline(weekJobs);
+          }),
         ),
       ],
     );

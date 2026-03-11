@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import '../../../core/routes/route_path.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 import '../../widgets/animated_section.dart';
+import '../../../global/controler/job/job_controller.dart';
+import '../../../global/service/job/job_service.dart';
 
 class JobScreen extends StatefulWidget {
   const JobScreen({Key? key}) : super(key: key);
@@ -13,6 +16,7 @@ class JobScreen extends StatefulWidget {
 
 class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _jobController = Get.put(JobController());
 
   @override
   void initState() {
@@ -121,14 +125,44 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
             ),
             // Job List
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildJobList(),
-                  _buildJobList(),
-                  _buildJobList(),
-                ],
-              ),
+              child: Obx(() {
+                if (_jobController.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF2563EB),
+                    ),
+                  );
+                }
+
+                if (_jobController.errorMessage.value.isNotEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _jobController.errorMessage.value,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => _jobController.fetchJobs(),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildJobList(_jobController.todayJobs),
+                    _buildJobList(_jobController.upcomingJobs),
+                    _buildJobList(_jobController.completedJobs),
+                  ],
+                );
+              }),
             ),
           ],
         ),
@@ -136,72 +170,47 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
     );
   }
 
-  Widget _buildJobList() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: [
-        AnimatedSection(
-          index: 3,
-          child: _buildJobCard(
-            jobNumber: '#1023',
-            address: '123 Elm St, Downtown',
-            jobType: 'Leak Repair',
-            time: '8:00 AM',
-            vehicle: 'Truck 12',
-            vehicleNo: 'ABC-1234',
-            color: const Color(0xFFFFE5E5),
-            status: 'Safety Check Required',
+  Widget _buildJobList(List<JobData> jobs) {
+    if (jobs.isEmpty) {
+      return const Center(
+        child: Text(
+          'No jobs available',
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 16,
+            fontFamily: 'Poppins',
           ),
         ),
-        const SizedBox(height: 16),
-        AnimatedSection(
-          index: 4,
-          child: _buildJobCard(
-            jobNumber: '#1022',
-            address: '892 Maple Ave, Westfield',
-            jobType: 'Not Mentioned',
-            time: '9:30 AM',
-            vehicle: 'Van 9',
-            vehicleNo: 'XYZ-5678',
-            color: const Color(0xFFE5F5E5),
-            status: 'In Progress',
-          ),
-        ),
-        const SizedBox(height: 16),
-        AnimatedSection(
-          index: 5,
-          child: _buildJobCard(
-            jobNumber: '#1021',
-            address: '55 Pine Rd, Lakeside',
-            jobType: 'Not Mentioned',
-            time: '4:00 AM',
-            vehicle: 'Van 7',
-            vehicleNo: 'XYZ-0025',
-            color: const Color(0xFFFFF9E5),
-            status: null,
-            showComplete: true,
-          ),
-        ),
-        const SizedBox(height: 100),
-      ],
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => _jobController.refreshJobs(),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: jobs.length,
+        itemBuilder: (context, index) {
+          final job = jobs[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: AnimatedSection(
+              index: index + 3,
+              child: _buildJobCard(job),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildJobCard({
-    required String jobNumber,
-    required String address,
-    required String jobType,
-    required String time,
-    required String vehicle,
-    required String vehicleNo,
-    required Color color,
-    String? status,
-    bool showComplete = false,
-  }) {
+  Widget _buildJobCard(JobData job) {
+    final statusText = job.getStatusText();
+    final isCompleted = job.isCompleted();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color,
+        color: job.getCardColor(),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -212,7 +221,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Job $jobNumber',
+                'Job ${job.jobId}',
                 style: const TextStyle(
                   color: Color(0xFF1E40AF),
                   fontSize: 16,
@@ -221,7 +230,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                   height: 1.05,
                 ),
               ),
-              if (status != null && status == 'In Progress')
+              if (statusText != null && statusText == 'In Progress')
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
@@ -229,7 +238,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    status,
+                    statusText,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -239,7 +248,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                     ),
                   ),
                 ),
-              if (showComplete)
+              if (isCompleted)
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
@@ -265,14 +274,16 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
             children: [
               const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFF323232)),
               const SizedBox(width: 6),
-              Text(
-                address,
-                style: const TextStyle(
-                  color: Color(0xFF323232),
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                  height: 1.05,
+              Expanded(
+                child: Text(
+                  job.client.address,
+                  style: const TextStyle(
+                    color: Color(0xFF323232),
+                    fontSize: 14,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    height: 1.05,
+                  ),
                 ),
               ),
             ],
@@ -280,7 +291,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
           const SizedBox(height: 8),
           // Job Type
           Text(
-            jobType,
+            job.jobName,
             style: const TextStyle(
               color: Color(0xFF323232),
               fontSize: 14,
@@ -301,7 +312,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                   const Icon(Icons.access_time, size: 16, color: Color(0xB2323232)),
                   const SizedBox(width: 4),
                   Text(
-                    time,
+                    job.getFormattedTime(),
                     style: const TextStyle(
                       color: Color(0xB2323232),
                       fontSize: 14,
@@ -319,7 +330,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                   const Icon(Icons.local_shipping_outlined, size: 16, color: Color(0xB2323232)),
                   const SizedBox(width: 4),
                   Text(
-                    vehicle,
+                    job.vehicle.name,
                     style: const TextStyle(
                       color: Color(0xB2323232),
                       fontSize: 14,
@@ -337,7 +348,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                   const Icon(Icons.directions_car_outlined, size: 16, color: Color(0xB2323232)),
                   const SizedBox(width: 4),
                   Text(
-                    'Vehicle no: $vehicleNo',
+                    'Vehicle no: ${job.vehicle.vehicleNumber}',
                     style: const TextStyle(
                       color: Color(0xB2323232),
                       fontSize: 14,
@@ -357,7 +368,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
             onTap: () {
               context.pushNamed(
                 RoutePath.jobDetails,
-                queryParameters: {'jobId': jobNumber},
+                queryParameters: {'jobId': job.jobId},
               );
             },
             child: Container(

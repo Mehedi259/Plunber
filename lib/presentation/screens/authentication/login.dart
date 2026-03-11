@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import '../../../global/controler/auth/login_controler.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _loginController = Get.put(LoginController());
   bool _rememberMe = false;
   bool _isPasswordVisible = false;
   
@@ -411,37 +414,100 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   }
 
   Widget _buildContinueButton() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            context.goNamed('profile-setup');
-          },
-          borderRadius: BorderRadius.circular(8.r),
-          child: Ink(
-            decoration: BoxDecoration(
-              color: const Color(0xFF2563EB),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Container(
-              height: 41.h,
-              alignment: Alignment.center,
-              child: Text(
-                'Continue',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
+    return Obx(() {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _loginController.isLoading.value ? null : _handleLogin,
+            borderRadius: BorderRadius.circular(8.r),
+            child: Ink(
+              decoration: BoxDecoration(
+                color: _loginController.isLoading.value
+                    ? const Color(0xFF2563EB).withOpacity(0.6)
+                    : const Color(0xFF2563EB),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Container(
+                height: 41.h,
+                alignment: Alignment.center,
+                child: _loginController.isLoading.value
+                    ? SizedBox(
+                        width: 20.w,
+                        height: 20.h,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text(
+                        'Continue',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
               ),
             ),
           ),
         ),
-      ),
+      );
+    });
+  }
+
+  Future<void> _handleLogin() async {
+    // Dismiss keyboard
+    FocusScope.of(context).unfocus();
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    final success = await _loginController.login(
+      email: email,
+      password: password,
     );
+
+    if (success) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Logged in successfully'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        
+        // Navigate after showing snackbar
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            context.goNamed('profile-setup');
+          }
+        });
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_loginController.errorMessage.value),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildSocialButton({
@@ -467,16 +533,20 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 icon,
                 SizedBox(width: 8.w),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: const Color(0xFF111928),
-                    fontSize: 14.sp,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
+                Flexible(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: const Color(0xFF111928),
+                      fontSize: 14.sp,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

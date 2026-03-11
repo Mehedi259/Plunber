@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../global/controler/profile/profile_setup_controller.dart';
+import '../../../global/service/profile/profile_setup_service.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({Key? key}) : super(key: key);
@@ -14,6 +17,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _nameController = TextEditingController();
   final _mobileController = TextEditingController();
   final _employeeIdController = TextEditingController();
+  final _emergencyNameController = TextEditingController();
+  final _emergencyMobileController = TextEditingController();
+  final _emergencyRelationController = TextEditingController();
+  final _profileSetupController = Get.put(ProfileSetupController());
   
   String _selectedRole = 'Select role';
   String _selectedSkill = 'Select skill';
@@ -23,6 +30,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     _nameController.dispose();
     _mobileController.dispose();
     _employeeIdController.dispose();
+    _emergencyNameController.dispose();
+    _emergencyMobileController.dispose();
+    _emergencyRelationController.dispose();
     super.dispose();
   }
 
@@ -160,7 +170,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _buildDropdownField(_selectedSkill, ['Select skill', 'Plumbing', 'Pipe Fitting', 'Leak Repair', 'Installation'], false),
+                _buildDropdownField(_selectedSkill, ['Select skill', 'General', 'Plumbing', 'Pipe Fitting', 'Leak Repair', 'Installation'], false),
                 const SizedBox(height: 24),
 
                 // Employee ID
@@ -204,34 +214,164 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     contentPadding: const EdgeInsets.all(16),
                   ),
                 ),
+                const SizedBox(height: 24),
+
+                // Emergency Contact Section
+                const Text(
+                  'Emergency Contact',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Emergency Contact Name
+                const Text(
+                  'Name',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _emergencyNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter name',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter emergency contact name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                // Emergency Contact Mobile
+                const Text(
+                  'Mobile Number',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _emergencyMobileController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    hintText: '+1234567890',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter emergency contact mobile';
+                    }
+                    // Basic phone validation - must start with + and have at least 10 digits
+                    if (!value.startsWith('+') || value.length < 11) {
+                      return 'Please enter valid phone with country code (e.g., +1234567890)';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                // Emergency Contact Relation
+                const Text(
+                  'Relation',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _emergencyRelationController,
+                  decoration: InputDecoration(
+                    hintText: 'What is your relation with them?',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter relation';
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 40),
 
                 // Continue Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        context.pushNamed(RoutePath.workDetails);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                Obx(() {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _profileSetupController.isLoading.value
+                          ? null
+                          : _handleContinue,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        disabledBackgroundColor: const Color(0xFF2563EB).withOpacity(0.6),
                       ),
+                      child: _profileSetupController.isLoading.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Continue',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+                  );
+                }),
                 const SizedBox(height: 16),
               ],
             ),
@@ -278,5 +418,76 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleContinue() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_selectedRole == 'Select role') {
+      Get.snackbar(
+        'Error',
+        'Please select a role',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    if (_selectedSkill == 'Select skill') {
+      Get.snackbar(
+        'Error',
+        'Please select a skill',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    final emergencyContact = EmergencyContact(
+      name: _emergencyNameController.text.trim(),
+      mobile: _emergencyMobileController.text.trim(),
+      relation: _emergencyRelationController.text.trim(),
+    );
+
+    // Convert display names to API format
+    String primarySkillApi = _selectedSkill.toLowerCase().replaceAll(' ', '_');
+    String professionApi = _selectedRole.toLowerCase();
+
+    final success = await _profileSetupController.updateProfileStep1(
+      fullName: _nameController.text.trim(),
+      phone: _mobileController.text.trim(),
+      primarySkill: primarySkillApi,
+      profession: professionApi,
+      employeeId: _employeeIdController.text.trim(),
+      emergencyContact: emergencyContact,
+    );
+
+    if (success) {
+      Get.snackbar(
+        'Success',
+        'Profile updated successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          context.pushNamed(RoutePath.workDetails);
+        }
+      });
+    } else {
+      Get.snackbar(
+        'Error',
+        _profileSetupController.errorMessage.value,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    }
   }
 }
