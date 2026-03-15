@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:get/get.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../service/profile/profile_setup_service.dart';
 
 class ProfileSetupController extends GetxController {
@@ -53,7 +53,7 @@ class ProfileSetupController extends GetxController {
     required bool usesCompanyVehicle,
     required String driversLicenseNumber,
     required String licenseExpiryDate,
-    File? driversLicenseFile,
+    PlatformFile? driversLicenseFile,
   }) async {
     if (driversLicenseNumber.isEmpty || licenseExpiryDate.isEmpty) {
       errorMessage.value = 'Please fill all required fields';

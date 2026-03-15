@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:file_picker/file_picker.dart';
 import '../../constant/api_constant.dart';
 import '../../storage/storage_helper.dart';
 import '../api_services.dart';
@@ -56,7 +57,7 @@ class ProfileSetupService {
     required bool usesCompanyVehicle,
     required String driversLicenseNumber,
     required String licenseExpiryDate,
-    File? driversLicenseFile,
+    PlatformFile? driversLicenseFile,
   }) async {
     try {
       final token = StorageHelper.getString(ApiConstants.accessTokenKey);
@@ -83,15 +84,27 @@ class ProfileSetupService {
 
       // Add file if provided
       if (driversLicenseFile != null) {
-        final fileStream = http.ByteStream(driversLicenseFile.openRead());
-        final fileLength = await driversLicenseFile.length();
-        final multipartFile = http.MultipartFile(
-          'drivers_license_file',
-          fileStream,
-          fileLength,
-          filename: driversLicenseFile.path.split('/').last,
-        );
-        request.files.add(multipartFile);
+        if (kIsWeb) {
+          // Web: use bytes directly
+          if (driversLicenseFile.bytes != null) {
+            final multipartFile = http.MultipartFile.fromBytes(
+              'drivers_license_file',
+              driversLicenseFile.bytes!,
+              filename: driversLicenseFile.name,
+            );
+            request.files.add(multipartFile);
+          }
+        } else {
+          // Mobile/Desktop: use file path
+          if (driversLicenseFile.path != null) {
+            final multipartFile = await http.MultipartFile.fromPath(
+              'drivers_license_file',
+              driversLicenseFile.path!,
+              filename: driversLicenseFile.name,
+            );
+            request.files.add(multipartFile);
+          }
+        }
       }
 
       final streamedResponse = await request.send();

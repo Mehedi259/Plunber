@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../core/utils/snackbar_helper.dart';
 import '../../../global/controler/profile/profile_setup_controller.dart';
 
 class WorkDetailsScreen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
   
   bool _useCompanyVehicle = false;
   bool _agreeToSafety = false;
-  File? _licenseFile;
+  PlatformFile? _licenseFile;
   String? _licenseFileName;
   DateTime? _selectedDate;
 
@@ -343,22 +343,19 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+        withData: true, // Important for web - loads file bytes
       );
 
-      if (result != null && result.files.single.path != null) {
+      if (result != null && result.files.isNotEmpty) {
         setState(() {
-          _licenseFile = File(result.files.single.path!);
+          _licenseFile = result.files.single;
           _licenseFileName = result.files.single.name;
         });
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to pick file: ${e.toString()}',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, 'Failed to pick file: ${e.toString()}');
+      }
     }
   }
 
@@ -368,13 +365,9 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
     }
 
     if (_selectedDate == null) {
-      Get.snackbar(
-        'Error',
-        'Please select license expiry date',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, 'Please select license expiry date');
+      }
       return;
     }
 
@@ -389,27 +382,19 @@ class _WorkDetailsScreenState extends State<WorkDetailsScreen> {
     );
 
     if (success) {
-      Get.snackbar(
-        'Success',
-        'Work details updated successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
-
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          context.goNamed(RoutePath.home);
-        }
-      });
+      if (mounted) {
+        SnackbarHelper.showSuccess(context, 'Work details updated successfully');
+        
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            context.goNamed(RoutePath.home);
+          }
+        });
+      }
     } else {
-      Get.snackbar(
-        'Error',
-        _profileSetupController.errorMessage.value,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, _profileSetupController.errorMessage.value);
+      }
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../core/utils/snackbar_helper.dart';
 import '../../../global/controler/profile/profile_setup_controller.dart';
 import '../../../global/service/profile/profile_setup_service.dart';
 
@@ -426,24 +427,16 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     }
 
     if (_selectedRole == 'Select role') {
-      Get.snackbar(
-        'Error',
-        'Please select a role',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, 'Please select a role');
+      }
       return;
     }
 
     if (_selectedSkill == 'Select skill') {
-      Get.snackbar(
-        'Error',
-        'Please select a skill',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, 'Please select a skill');
+      }
       return;
     }
 
@@ -467,27 +460,31 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     );
 
     if (success) {
-      Get.snackbar(
-        'Success',
-        'Profile updated successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
 
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          context.pushNamed(RoutePath.workDetails);
-        }
-      });
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            context.pushNamed(RoutePath.workDetails);
+          }
+        });
+      }
     } else {
-      Get.snackbar(
-        'Error',
-        _profileSetupController.errorMessage.value,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_profileSetupController.errorMessage.value),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 }

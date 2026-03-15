@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../core/utils/snackbar_helper.dart';
 import '../../widgets/animated_section.dart';
 import '../../../global/controler/profile/employee_profile_controller.dart';
 
@@ -435,27 +436,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final success = await _profileController.deleteAccount();
                 
                 if (success) {
-                  Get.snackbar(
-                    'Success',
-                    'Account deleted successfully',
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                    snackPosition: SnackPosition.TOP,
-                  );
-                  
-                  Future.delayed(const Duration(milliseconds: 500), () {
-                    if (mounted) {
-                      context.goNamed(RoutePath.login);
-                    }
-                  });
+                  if (mounted) {
+                    SnackbarHelper.showSuccess(context, 'Account deleted successfully');
+                    
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        context.goNamed(RoutePath.login);
+                      }
+                    });
+                  }
                 } else {
-                  Get.snackbar(
-                    'Error',
-                    _profileController.errorMessage.value,
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                    snackPosition: SnackPosition.TOP,
-                  );
+                  if (mounted) {
+                    SnackbarHelper.showError(context, _profileController.errorMessage.value);
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -483,27 +476,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final success = await _profileController.logout();
     
     if (success) {
-      Get.snackbar(
-        'Success',
-        'Logged out successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
-      
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          context.goNamed(RoutePath.login);
-        }
-      });
+      if (mounted) {
+        SnackbarHelper.showSuccess(context, 'Logged out successfully');
+        
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            context.goNamed(RoutePath.login);
+          }
+        });
+      }
     } else {
-      Get.snackbar(
-        'Error',
-        _profileController.errorMessage.value,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, _profileController.errorMessage.value);
+      }
     }
   }
 

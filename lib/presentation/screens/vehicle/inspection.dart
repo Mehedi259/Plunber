@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/utils/snackbar_helper.dart';
 import '../../../global/controler/inspection/inspection_controller.dart';
 import '../../../global/service/inspection/inspection_service.dart';
 
@@ -527,13 +528,9 @@ class _InspectionScreenState extends State<InspectionScreen> {
     }
 
     if (!canSubmit) {
-      Get.snackbar(
-        'Validation Error',
-        errorMessage!,
-        backgroundColor: const Color(0xFFEF4444),
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, errorMessage!);
+      }
       return;
     }
 
@@ -568,13 +565,9 @@ class _InspectionScreenState extends State<InspectionScreen> {
         _showSubmitDialog(context, response.hasOpenIssue ?? false);
       }
     } else {
-      Get.snackbar(
-        'Error',
-        response.message,
-        backgroundColor: const Color(0xFFEF4444),
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (mounted) {
+        SnackbarHelper.showError(context, response.message);
+      }
     }
   }
 
