@@ -37,7 +37,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = [
     const JobScreen(),
     const CalendarScreen(),
-    VehicleScreen(vehicleId: 'default-vehicle-id'), // TODO: Get from user's assigned vehicle
+    const VehicleScreen(vehicleId: ''), // Empty ID will be handled gracefully
     const ProfileScreen(),
   ];
 

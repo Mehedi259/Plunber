@@ -81,18 +81,18 @@ class VehicleData {
 
   factory VehicleData.fromJson(Map<String, dynamic> json) {
     return VehicleData(
-      id: json['id'],
-      name: json['name'],
-      plate: json['plate'],
-      status: json['status'],
-      make: json['make'],
-      modelName: json['model_name'],
-      year: json['year'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      plate: json['plate'] ?? '',
+      status: json['status'] ?? '',
+      make: json['make'] ?? '',
+      modelName: json['model_name'] ?? '',
+      year: json['year'] ?? 0,
       image: json['image'],
-      currentOdometerKm: json['current_odometer_km'],
-      nextServiceKm: json['next_service_km'],
-      kmUntilService: json['km_until_service'],
-      lastInspectionDate: json['last_inspection_date'],
+      currentOdometerKm: json['current_odometer_km'] ?? 0,
+      nextServiceKm: json['next_service_km'] ?? 0,
+      kmUntilService: json['km_until_service'] ?? 0,
+      lastInspectionDate: json['last_inspection_date'] ?? '',
       notes: json['notes'],
       maintenanceHistory: (json['maintenance_history'] as List?)
           ?.map((history) => MaintenanceHistory.fromJson(history))
@@ -146,10 +146,10 @@ class MaintenanceHistory {
 
   factory MaintenanceHistory.fromJson(Map<String, dynamic> json) {
     return MaintenanceHistory(
-      id: json['id'],
-      scheduledDate: json['scheduled_date'],
-      status: json['status'],
-      description: json['description'],
+      id: json['id'] ?? '',
+      scheduledDate: json['scheduled_date'] ?? '',
+      status: json['status'] ?? '',
+      description: json['description'] ?? '',
     );
   }
 

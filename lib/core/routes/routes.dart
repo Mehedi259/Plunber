@@ -8,6 +8,7 @@ import '../../presentation/screens/authentication/reset_password.dart';
 import '../../presentation/screens/authentication/reset_password_success.dart';
 import '../../presentation/screens/authentication/sign_up.dart';
 import '../../presentation/screens/authentication/sign_up_otp.dart';
+import '../../presentation/screens/authentication/otp_verification_screen.dart';
 import '../../presentation/screens/splash/splash.dart';
 import '../../presentation/widgets/custom_navigation/main_navigation.dart';
 import '../../presentation/screens/notification/notification.dart';
@@ -15,6 +16,7 @@ import '../../presentation/screens/job/job_details.dart';
 import '../../presentation/screens/job/seafty_check_required.dart';
 import '../../presentation/screens/job/start_job.dart';
 import '../../presentation/screens/job/problem_submit.dart';
+import '../../presentation/screens/job/problem_details_screen.dart';
 import '../../presentation/screens/vehicle/inspection.dart';
 import '../../presentation/screens/vehicle/inspection_history.dart';
 import '../../presentation/screens/profile/certifiction.dart';
@@ -57,6 +59,14 @@ class AppRouter {
         name: RoutePath.signUpOtp,
         path: RoutePath.signUpOtp.addBasePath,
         builder: (context, state) => const SignUpOtpScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.signUpVerifyOtp,
+        path: RoutePath.signUpVerifyOtp.addBasePath,
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return OtpVerificationScreen(email: email);
+        },
       ),
       GoRoute(
         name: RoutePath.forgetPassword,
@@ -146,6 +156,22 @@ class AppRouter {
         builder: (context, state) {
           final jobId = state.uri.queryParameters['jobId'] ?? '';
           return ProblemSubmitScreen(jobId: jobId);
+        },
+      ),
+      GoRoute(
+        name: RoutePath.problemDetails,
+        path: RoutePath.problemDetails.addBasePath,
+        builder: (context, state) {
+          final jobId = state.uri.queryParameters['jobId'] ?? '';
+          final jobReportId = state.uri.queryParameters['jobReportId'] ?? '';
+          final reportType = state.uri.queryParameters['reportType'] ?? '';
+          final reportTypeDisplay = state.uri.queryParameters['reportTypeDisplay'] ?? '';
+          return ProblemDetailsScreen(
+            jobId: jobId,
+            jobReportId: jobReportId,
+            reportType: reportType,
+            reportTypeDisplay: reportTypeDisplay,
+          );
         },
       ),
 

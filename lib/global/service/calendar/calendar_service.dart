@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import '../../constant/api_constant.dart';
 import '../api_services.dart';
 import '../job/job_service.dart';
@@ -6,13 +7,19 @@ import '../job/job_service.dart';
 class CalendarService {
   Future<CalendarResponse> getCalendarJobs() async {
     try {
+      log('Fetching calendar jobs from: ${ApiConstants.calendar}');
+      
       final response = await ApiService.get(
         endpoint: ApiConstants.calendar,
         includeAuth: true,
       );
 
+      log('Calendar API response status: ${response.statusCode}');
+      log('Calendar API response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        log('Parsed calendar data: $data');
         
         return CalendarResponse(
           success: true,
@@ -36,6 +43,7 @@ class CalendarService {
         );
       }
     } catch (e) {
+      log('Calendar API error: $e');
       return CalendarResponse(
         success: false,
         message: 'Network error: ${e.toString()}',

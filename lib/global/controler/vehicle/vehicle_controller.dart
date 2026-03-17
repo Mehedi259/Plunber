@@ -9,6 +9,13 @@ class VehicleController extends GetxController {
   final Rx<VehicleData?> vehicle = Rx<VehicleData?>(null);
 
   Future<void> fetchVehicleDetails(String vehicleId) async {
+    // Handle empty or invalid vehicle ID
+    if (vehicleId.isEmpty || vehicleId == 'default-vehicle-id') {
+      isLoading.value = false;
+      errorMessage.value = 'No vehicle assigned to your account';
+      return;
+    }
+
     isLoading.value = true;
     errorMessage.value = '';
 

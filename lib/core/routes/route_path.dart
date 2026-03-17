@@ -9,6 +9,7 @@ class RoutePath {
   static const String login = 'login';
   static const String signup = 'signup';
   static const String signUpOtp = 'signup-otp';
+  static const String signUpVerifyOtp = 'signup-verify-otp';
   static const String forgetPassword = 'forget-password';
   static const String forgetPasswordOtp = 'forget-password-otp';
   static const String resetPassword = 'reset-password';
@@ -20,6 +21,7 @@ class RoutePath {
   static const String safetyCheck = 'safety-check';
   static const String startJob = 'start-job';
   static const String problemSubmit = 'problem-submit';
+  static const String problemDetails = 'problem-details';
 
   //==================================== Profile Setup screens =====================================
   static const String profileSetup = 'profile-setup';

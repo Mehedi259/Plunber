@@ -368,7 +368,7 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
             onTap: () {
               context.pushNamed(
                 RoutePath.jobDetails,
-                queryParameters: {'jobId': job.jobId},
+                queryParameters: {'jobId': job.id},
               );
             },
             child: Container(

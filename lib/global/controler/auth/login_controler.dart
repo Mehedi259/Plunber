@@ -1,15 +1,14 @@
 import 'package:get/get.dart';
-import '../../service/auth/login_service.dart';
+import '../../service/auth/auth_service.dart';
 
 class LoginController extends GetxController {
-  final LoginService _loginService = LoginService();
-
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
   Future<bool> login({
     required String email,
     required String password,
+    bool rememberMe = false,
   }) async {
     if (email.isEmpty || password.isEmpty) {
       errorMessage.value = 'Email and password are required';
@@ -20,17 +19,18 @@ class LoginController extends GetxController {
     errorMessage.value = '';
 
     try {
-      final response = await _loginService.login(
+      final result = await AuthService.login(
         email: email,
         password: password,
+        rememberMe: rememberMe,
       );
 
-      if (response.success) {
-        isLoading.value = false;
+      isLoading.value = false;
+
+      if (result['success']) {
         return true;
       } else {
-        errorMessage.value = response.message;
-        isLoading.value = false;
+        errorMessage.value = result['message'];
         return false;
       }
     } catch (e) {
@@ -41,14 +41,14 @@ class LoginController extends GetxController {
   }
 
   Future<void> logout() async {
-    await _loginService.logout();
+    await AuthService.logout();
   }
 
-  bool isLoggedIn() {
-    return _loginService.isLoggedIn();
+  Future<bool> checkAuthStatus() async {
+    return await AuthService.checkAuthStatus();
   }
 
-  UserData? getCurrentUser() {
-    return _loginService.getCurrentUser();
+  Map<String, dynamic>? getCurrentUser() {
+    return AuthService.getCurrentUser();
   }
 }

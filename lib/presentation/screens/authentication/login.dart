@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
+import 'dart:developer';
 import '../../../global/controler/auth/login_controler.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -468,6 +469,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final success = await _loginController.login(
       email: email,
       password: password,
+      rememberMe: _rememberMe,
     );
 
     if (success) {
@@ -485,10 +487,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           ),
         );
         
+        // Check if user needs onboarding
+        final user = _loginController.getCurrentUser();
+        final onboardingComplete = user?['onboarding_complete'] ?? false;
+        
+        log('User onboarding status: $onboardingComplete');
+        
         // Navigate after showing snackbar
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
-            context.goNamed('profile-setup');
+            if (onboardingComplete) {
+              log('Navigating to home - onboarding complete');
+              context.goNamed('home');
+            } else {
+              log('Navigating to profile setup - onboarding incomplete');
+              context.goNamed('profile-setup');
+            }
           }
         });
       }

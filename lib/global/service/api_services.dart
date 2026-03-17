@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../constant/api_constant.dart';
 import '../storage/storage_helper.dart';
+import 'auth/token_manager.dart';
 
 class ApiService {
   static Future<Map<String, String>> _getHeaders({bool includeAuth = false}) async {
@@ -11,7 +12,7 @@ class ApiService {
     };
 
     if (includeAuth) {
-      final token = StorageHelper.getString(ApiConstants.accessTokenKey);
+      final token = await TokenManager.getValidAccessToken();
       if (token != null) {
         headers['Authorization'] = 'Bearer $token';
       }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import '../../../global/service/auth/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -18,6 +19,8 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
   String? _selectedYear;
   bool _acceptTerms = false;
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
+  String? _errorMessage;
   
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -61,6 +64,62 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  String get _birthDate {
+    if (_selectedYear != null && _selectedMonth != null && _selectedDay != null) {
+      return '$_selectedYear-${_selectedMonth!.padLeft(2, '0')}-${_selectedDay!.padLeft(2, '0')}';
+    }
+    return '';
+  }
+
+  bool get _isFormValid {
+    return _emailController.text.isNotEmpty &&
+           _usernameController.text.isNotEmpty &&
+           _passwordController.text.isNotEmpty &&
+           _selectedDay != null &&
+           _selectedMonth != null &&
+           _selectedYear != null &&
+           _acceptTerms;
+  }
+
+  Future<void> _createAccount() async {
+    if (!_isFormValid) {
+      setState(() {
+        _errorMessage = 'Please fill all fields and accept terms';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final result = await AuthService.initiateRegistration(
+      email: _emailController.text.trim(),
+      username: _usernameController.text.trim(),
+      password: _passwordController.text,
+      birthDate: _birthDate,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result['success']) {
+      // Navigate to OTP verification screen
+      if (mounted) {
+        context.goNamed(
+          'signup-verify-otp',
+          queryParameters: {'email': _emailController.text.trim()},
+        );
+      }
+    } else {
+      setState(() {
+        _errorMessage = result['message'];
+      });
+    }
   }
 
   @override
@@ -232,6 +291,28 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                   ),
                   
                   SizedBox(height: 16.h),
+                  
+                  // Error Message
+                  if (_errorMessage != null)
+                    Container(
+                      margin: EdgeInsets.only(bottom: 16.h),
+                      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF2F2),
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: const Color(0xFFFECACA)),
+                      ),
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: const Color(0xFFDC2626),
+                          fontSize: 14.sp,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   
                   // Create Account Button
                   _buildCreateAccountButton(),
@@ -451,31 +532,36 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: _acceptTerms
-              ? () {
-                  context.goNamed('signup-otp');
-                }
-              : null,
+          onTap: (_isFormValid && !_isLoading) ? _createAccount : null,
           borderRadius: BorderRadius.circular(8.r),
           child: Ink(
             decoration: BoxDecoration(
-              color: _acceptTerms
+              color: (_isFormValid && !_isLoading)
                   ? const Color(0xFF2563EB)
                   : const Color(0xFFD1D5DB),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Container(
-              height: 41.h,
+              height: 48.h,
               alignment: Alignment.center,
-              child: Text(
-                'Create account',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              child: _isLoading
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      'Create account',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.sp,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
             ),
           ),
         ),

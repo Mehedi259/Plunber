@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import '../../constant/api_constant.dart';
 import '../../storage/storage_helper.dart';
 import '../api_services.dart';
+import '../auth/token_manager.dart';
 
 class ProfileSetupService {
   Future<ProfileSetupResponse> updateProfileStep1({
@@ -25,14 +27,23 @@ class ProfileSetupService {
         if (emergencyContact != null) 'emergency_contact': emergencyContact.toJson(),
       };
 
+      log('Profile update request body: $body');
+
       final response = await ApiService.patch(
         endpoint: ApiConstants.onboardingStep1,
         body: body,
         includeAuth: true,
       );
 
+      log('Profile update response status: ${response.statusCode}');
+      log('Profile update response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        
+        // Update user data in storage with onboarding status
+        await _updateUserDataInStorage(data['data']);
+        
         return ProfileSetupResponse(
           success: true,
           message: 'Profile updated successfully',
@@ -46,6 +57,7 @@ class ProfileSetupService {
         );
       }
     } catch (e) {
+      log('Profile update error: $e');
       return ProfileSetupResponse(
         success: false,
         message: 'Network error: ${e.toString()}',
@@ -60,7 +72,7 @@ class ProfileSetupService {
     PlatformFile? driversLicenseFile,
   }) async {
     try {
-      final token = StorageHelper.getString(ApiConstants.accessTokenKey);
+      final token = await TokenManager.getValidAccessToken();
       if (token == null) {
         return ProfileSetupResponse(
           success: false,
@@ -112,6 +124,10 @@ class ProfileSetupService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        
+        // Update user data in storage with onboarding status
+        await _updateUserDataInStorage(data['data']);
+        
         return ProfileSetupResponse(
           success: true,
           message: 'Work details updated successfully',
@@ -129,6 +145,35 @@ class ProfileSetupService {
         success: false,
         message: 'Network error: ${e.toString()}',
       );
+    }
+  }
+
+  // Helper method to update user data in storage
+  Future<void> _updateUserDataInStorage(Map<String, dynamic>? profileData) async {
+    if (profileData == null) return;
+
+    try {
+      // Get current user data
+      final currentUserDataString = StorageHelper.getString(ApiConstants.userDataKey);
+      if (currentUserDataString != null) {
+        final currentUserData = jsonDecode(currentUserDataString) as Map<String, dynamic>;
+        
+        // Update with new profile data
+        if (profileData['onboarding_complete'] != null) {
+          currentUserData['onboarding_complete'] = profileData['onboarding_complete'];
+          log('Updated onboarding_complete to: ${profileData['onboarding_complete']}');
+        }
+        
+        // Save updated user data
+        await StorageHelper.saveString(
+          ApiConstants.userDataKey,
+          jsonEncode(currentUserData),
+        );
+        
+        log('User data updated in storage');
+      }
+    } catch (e) {
+      log('Error updating user data in storage: $e');
     }
   }
 }

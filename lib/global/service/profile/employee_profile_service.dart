@@ -234,15 +234,15 @@ class EmployeeProfile {
 
   factory EmployeeProfile.fromJson(Map<String, dynamic> json) {
     return EmployeeProfile(
-      id: json['id'],
-      fullName: json['full_name'],
-      email: json['email'],
-      phone: json['phone'],
+      id: json['id'] ?? '',
+      fullName: json['full_name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
       profilePicture: json['profile_picture'],
-      role: json['role'],
-      primarySkill: json['primary_skill'],
-      employeeId: json['employee_id'],
-      profession: json['profession'],
+      role: json['role'] ?? 'employee',
+      primarySkill: json['primary_skill'] ?? '',
+      employeeId: json['employee_id'] ?? '',
+      profession: json['profession'] ?? '',
       emergencyContact: json['emergency_contact'] != null
           ? EmergencyContactData.fromJson(json['emergency_contact'])
           : null,
@@ -251,8 +251,8 @@ class EmployeeProfile {
       licenseExpiryDate: json['license_expiry_date'] ?? '',
       driversLicenseFile: json['drivers_license_file'],
       onboardingComplete: json['onboarding_complete'] ?? false,
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
     );
   }
 }
@@ -272,10 +272,10 @@ class EmergencyContactData {
 
   factory EmergencyContactData.fromJson(Map<String, dynamic> json) {
     return EmergencyContactData(
-      id: json['id'],
-      name: json['name'],
-      mobile: json['mobile'],
-      relation: json['relation'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      mobile: json['mobile'] ?? '',
+      relation: json['relation'] ?? '',
     );
   }
 }
