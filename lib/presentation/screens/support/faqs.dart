@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import '../../../global/controler/support/support_controller.dart';
 
 class FaqsScreen extends StatefulWidget {
   const FaqsScreen({Key? key}) : super(key: key);
@@ -10,29 +12,13 @@ class FaqsScreen extends StatefulWidget {
 
 class _FaqsScreenState extends State<FaqsScreen> {
   int? _expandedIndex;
+  final SupportController _controller = Get.put(SupportController());
 
-  final List<Map<String, String>> _faqs = [
-    {
-      'question': 'How do I see my assigned jobs?',
-      'answer':
-          'Go to the Jobs tab. You will see:\n• Today\n• Upcoming\n• Completed',
-    },
-    {
-      'question': 'Why can\'t I start a job?',
-      'answer':
-          'You must complete the Safety Checklist first. Jobs cannot begin until safety checks are submitted.',
-    },
-    {
-      'question': 'Can I edit a job after marking it complete?',
-      'answer':
-          'No, once a job is marked as complete, it cannot be edited. Please ensure all details are correct before completing.',
-    },
-    {
-      'question': 'What happens if I forget to upload photos?',
-      'answer':
-          'Photos are required for job completion. You will be prompted to upload photos before you can mark the job as complete.',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _controller.fetchFAQs();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,17 +41,52 @@ class _FaqsScreenState extends State<FaqsScreen> {
         ),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: _faqs.length,
-        itemBuilder: (context, index) {
-          return _buildFaqItem(
-            question: _faqs[index]['question']!,
-            answer: _faqs[index]['answer']!,
-            index: index,
+      body: Obx(() {
+        if (_controller.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(),
           );
-        },
-      ),
+        }
+
+        if (_controller.errorMessage.value.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _controller.errorMessage.value,
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => _controller.fetchFAQs(),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (_controller.faqs.isEmpty) {
+          return const Center(
+            child: Text('No FAQs available'),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: _controller.faqs.length,
+          itemBuilder: (context, index) {
+            final faq = _controller.faqs[index];
+            return _buildFaqItem(
+              question: faq.question,
+              answer: faq.answer,
+              index: index,
+            );
+          },
+        );
+      }),
     );
   }
 

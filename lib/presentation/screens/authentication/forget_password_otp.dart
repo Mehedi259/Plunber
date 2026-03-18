@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../global/service/auth/auth_service.dart';
 
 class ForgetPasswordOtpScreen extends StatefulWidget {
   const ForgetPasswordOtpScreen({super.key});
@@ -11,6 +12,65 @@ class ForgetPasswordOtpScreen extends StatefulWidget {
 class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
   final List<TextEditingController> _otpControllers = List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  bool _isLoading = false;
+  String? _errorMessage;
+  String? _email;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final uri = GoRouterState.of(context).uri;
+    _email = uri.queryParameters['email'];
+  }
+
+  String get _otpCode {
+    return _otpControllers.map((controller) => controller.text).join();
+  }
+
+  Future<void> _verifyOtp() async {
+    if (_otpCode.length != 6) {
+      setState(() {
+        _errorMessage = 'Please enter complete OTP';
+      });
+      return;
+    }
+
+    if (_email == null) {
+      setState(() {
+        _errorMessage = 'Email not found';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final result = await AuthService.verifyPasswordResetOtp(
+      email: _email!,
+      otp: _otpCode,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result['success']) {
+      if (mounted) {
+        context.goNamed(
+          'reset-password',
+          queryParameters: {
+            'reset_token': result['reset_token'],
+          },
+        );
+      }
+    } else {
+      setState(() {
+        _errorMessage = result['message'];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,13 +101,13 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
               RichText(
                 text: TextSpan(
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  children: const [
-                    TextSpan(text: 'We emailed you a six-digit code to '),
+                  children: [
+                    const TextSpan(text: 'We emailed you a six-digit code to '),
                     TextSpan(
-                      text: 'name@company.com',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                      text: _email ?? 'your email',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                     ),
-                    TextSpan(text: '. Enter the code below to confirm your email adress.'),
+                    const TextSpan(text: '. Enter the code below to confirm your email address.'),
                   ],
                 ),
               ),
@@ -90,22 +150,53 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
                 'Make sure to keep this window open while check your inbox',
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
-              const SizedBox(height: 40),
+              
+              const SizedBox(height: 20),
+              
+              // Error Message
+              if (_errorMessage != null)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFFECACA)),
+                  ),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(
+                      color: Color(0xFFDC2626),
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              
+              const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  context.goNamed('reset-password');
-                },
+                onPressed: _isLoading ? null : _verifyOtp,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2563EB),
+                  disabledBackgroundColor: const Color(0xFFD1D5DB),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Verify',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text(
+                        'Verify',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
               ),
             ],
           ),

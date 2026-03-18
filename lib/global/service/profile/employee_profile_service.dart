@@ -83,8 +83,8 @@ class EmployeeProfileService {
         final data = jsonDecode(response.body);
         return ProfileResponse(
           success: true,
-          message: data['message'] ?? 'Profile updated successfully',
-          profile: EmployeeProfile.fromJson(data['data']),
+          message: 'Profile updated successfully',
+          profile: EmployeeProfile.fromJson(data),
         );
       } else {
         final error = jsonDecode(response.body);

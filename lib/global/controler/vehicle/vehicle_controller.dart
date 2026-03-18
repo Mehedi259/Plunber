@@ -7,6 +7,37 @@ class VehicleController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
   final Rx<VehicleData?> vehicle = Rx<VehicleData?>(null);
+  final RxList<VehicleData> vehicles = <VehicleData>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchMyVehicles();
+  }
+
+  Future<void> fetchMyVehicles() async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    try {
+      final response = await _vehicleService.getMyVehicles();
+
+      if (response.success && response.vehicles.isNotEmpty) {
+        vehicles.value = response.vehicles;
+        vehicle.value = response.vehicles.first;
+        isLoading.value = false;
+      } else if (response.success && response.vehicles.isEmpty) {
+        errorMessage.value = 'No vehicles assigned to your account';
+        isLoading.value = false;
+      } else {
+        errorMessage.value = response.message;
+        isLoading.value = false;
+      }
+    } catch (e) {
+      errorMessage.value = 'An error occurred: ${e.toString()}';
+      isLoading.value = false;
+    }
+  }
 
   Future<void> fetchVehicleDetails(String vehicleId) async {
     // Handle empty or invalid vehicle ID
@@ -36,6 +67,6 @@ class VehicleController extends GetxController {
   }
 
   Future<void> refreshVehicle(String vehicleId) async {
-    await fetchVehicleDetails(vehicleId);
+    await fetchMyVehicles();
   }
 }

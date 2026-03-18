@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../widgets/animated_section.dart';
 import '../../../global/controler/calendar/calendar_controller.dart';
-import '../../../global/service/job/job_service.dart';
+import '../../../global/service/calendar/calendar_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -14,9 +14,9 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _calendarController = Get.put(CalendarController());
-  int _selectedDay = 19;
-  int _selectedMonth = 1; // January = 1
-  int _selectedYear = 2026;
+  late int _selectedDay;
+  late int _selectedMonth;
+  late int _selectedYear;
 
   final List<String> _monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -27,6 +27,12 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    
+    // Initialize with current date
+    final now = DateTime.now();
+    _selectedDay = now.day;
+    _selectedMonth = now.month;
+    _selectedYear = now.year;
   }
 
   @override
@@ -35,17 +41,73 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
     super.dispose();
   }
 
-  List<int> _getWeekDays() {
-    // Get the current week days based on selected day
-    final selectedDate = DateTime(_selectedYear, _selectedMonth, _selectedDay);
-    final weekday = selectedDate.weekday % 7; // 0 = Sunday, 6 = Saturday
+  List<List<int>> _getMonthDays() {
+    // Get all days in the selected month organized by weeks
+    final firstDayOfMonth = DateTime(_selectedYear, _selectedMonth, 1);
+    final lastDayOfMonth = DateTime(_selectedYear, _selectedMonth + 1, 0);
     
-    List<int> weekDays = [];
-    for (int i = -weekday; i < 7 - weekday; i++) {
-      final date = selectedDate.add(Duration(days: i));
-      weekDays.add(date.day);
+    // Get the weekday of the first day (0 = Sunday, 6 = Saturday)
+    final firstWeekday = firstDayOfMonth.weekday % 7;
+    
+    List<List<int>> weeks = [];
+    List<int> currentWeek = [];
+    
+    // Add empty spaces for days before the first day
+    for (int i = 0; i < firstWeekday; i++) {
+      currentWeek.add(0); // 0 means empty
     }
-    return weekDays;
+    
+    // Add all days of the month
+    for (int day = 1; day <= lastDayOfMonth.day; day++) {
+      currentWeek.add(day);
+      
+      if (currentWeek.length == 7) {
+        weeks.add(currentWeek);
+        currentWeek = [];
+      }
+    }
+    
+    // Add remaining days to complete the last week
+    if (currentWeek.isNotEmpty) {
+      while (currentWeek.length < 7) {
+        currentWeek.add(0);
+      }
+      weeks.add(currentWeek);
+    }
+    
+    return weeks;
+  }
+
+  List<CalendarJobData> _getJobsForSelectedDate() {
+    final selectedDate = DateTime(_selectedYear, _selectedMonth, _selectedDay);
+    final selectedDateOnly = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    
+    return _calendarController.thisWeekJobs.where((job) {
+      try {
+        final jobDate = DateTime.parse(job.scheduledDatetime);
+        final jobDateOnly = DateTime(jobDate.year, jobDate.month, jobDate.day);
+        return jobDateOnly.isAtSameMomentAs(selectedDateOnly);
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+  }
+
+  bool _hasJobsOnDate(int day) {
+    if (day == 0) return false;
+    
+    final date = DateTime(_selectedYear, _selectedMonth, day);
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    
+    return _calendarController.thisWeekJobs.any((job) {
+      try {
+        final jobDate = DateTime.parse(job.scheduledDatetime);
+        final jobDateOnly = DateTime(jobDate.year, jobDate.month, jobDate.day);
+        return jobDateOnly.isAtSameMomentAs(dateOnly);
+      } catch (e) {
+        return false;
+      }
+    });
   }
 
   void _changeMonth(bool next) {
@@ -164,7 +226,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
     );
   }
 
-  Widget _buildTimeline(List<JobData> jobs) {
+  Widget _buildTimeline(List<CalendarJobData> jobs) {
     if (jobs.isEmpty) {
       return const Center(
         child: Text(
@@ -194,7 +256,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
     );
   }
 
-  Widget _buildTimelineItem(JobData job) {
+  Widget _buildTimelineItem(CalendarJobData job) {
     final time = job.getFormattedTime();
     final timeLines = time.split(' ');
     final displayTime = timeLines.length > 1 
@@ -261,7 +323,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        job.client.address,
+                        job.clientAddress,
                         style: const TextStyle(fontSize: 14),
                       ),
                     ),
@@ -273,20 +335,24 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                     const Icon(Icons.access_time, size: 16, color: Colors.black54),
                     const SizedBox(width: 4),
                     Text(job.getFormattedTime(), style: const TextStyle(fontSize: 12)),
-                    const SizedBox(width: 16),
-                    const Icon(Icons.local_shipping_outlined, size: 16, color: Colors.black54),
-                    const SizedBox(width: 4),
-                    Text(job.vehicle.name, style: const TextStyle(fontSize: 12)),
+                    if (job.vehicleName != null) ...[
+                      const SizedBox(width: 16),
+                      const Icon(Icons.local_shipping_outlined, size: 16, color: Colors.black54),
+                      const SizedBox(width: 4),
+                      Text(job.vehicleName!, style: const TextStyle(fontSize: 12)),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.directions_car_outlined, size: 16, color: Colors.black54),
-                    const SizedBox(width: 4),
-                    Text('Vehicle no: ${job.vehicle.vehicleNumber}', style: const TextStyle(fontSize: 12)),
-                  ],
-                ),
+                if (job.vehiclePlate != null)
+                  const SizedBox(height: 4),
+                if (job.vehiclePlate != null)
+                  Row(
+                    children: [
+                      const Icon(Icons.directions_car_outlined, size: 16, color: Colors.black54),
+                      const SizedBox(width: 4),
+                      Text('Vehicle no: ${job.vehiclePlate}', style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -296,7 +362,7 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
   }
 
   Widget _buildWeekView() {
-    final weekDays = _getWeekDays();
+    final monthDays = _getMonthDays();
     
     return Column(
       children: [
@@ -311,31 +377,36 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Month Selector
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left, color: Colors.white),
+                      icon: const Icon(Icons.chevron_left, color: Colors.white, size: 20),
                       onPressed: () => _changeMonth(false),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                     Text(
                       '${_monthNames[_selectedMonth - 1]} $_selectedYear',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chevron_right, color: Colors.white),
+                      icon: const Icon(Icons.chevron_right, color: Colors.white, size: 20),
                       onPressed: () => _changeMonth(true),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                // Week Days
+                const SizedBox(height: 12),
+                // Week Days Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -348,23 +419,67 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
                     _buildWeekDayLabel('Sat'),
                   ],
                 ),
-                const SizedBox(height: 12),
-                // Week Days Numbers
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: weekDays.map((day) {
-                    return _buildDayNumber(day, day == _selectedDay);
-                  }).toList(),
-                ),
+                const SizedBox(height: 8),
+                // Month Days Grid
+                ...monthDays.map((week) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: week.map((day) {
+                        return _buildDayNumber(day, day == _selectedDay);
+                      }).toList(),
+                    ),
+                  );
+                }).toList(),
               ],
             ),
           ),
         ),
-        // Timeline
+        const SizedBox(height: 8),
+        // Jobs for Selected Date
         Expanded(
           child: Obx(() {
-            final weekJobs = _calendarController.getAllWeekJobs();
-            return _buildTimeline(weekJobs);
+            final selectedDateJobs = _getJobsForSelectedDate();
+            
+            if (selectedDateJobs.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.event_busy,
+                      size: 48,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No jobs on ${_monthNames[_selectedMonth - 1]} $_selectedDay',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            
+            return RefreshIndicator(
+              onRefresh: () => _calendarController.refreshCalendar(),
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: selectedDateJobs.length,
+                itemBuilder: (context, index) {
+                  final job = selectedDateJobs[index];
+                  return AnimatedSection(
+                    index: index + 3,
+                    child: _buildTimelineItem(job),
+                  );
+                },
+              ),
+            );
           }),
         ),
       ],
@@ -373,13 +488,13 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
 
   Widget _buildWeekDayLabel(String day) {
     return SizedBox(
-      width: 40,
+      width: 36,
       child: Text(
         day,
         textAlign: TextAlign.center,
         style: const TextStyle(
           color: Colors.white,
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -387,6 +502,13 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
   }
 
   Widget _buildDayNumber(int day, bool isSelected) {
+    if (day == 0) {
+      // Empty day
+      return const SizedBox(width: 36, height: 36);
+    }
+    
+    final hasJobs = _hasJobsOnDate(day);
+    
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -394,21 +516,44 @@ class _CalendarScreenState extends State<CalendarScreen> with SingleTickerProvid
         });
       },
       child: Container(
-        width: 40,
-        height: 40,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
           shape: BoxShape.circle,
+          border: hasJobs && !isSelected
+              ? Border.all(color: Colors.white, width: 1.5)
+              : null,
         ),
-        child: Center(
-          child: Text(
-            day.toString(),
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF2563EB) : Colors.white,
-              fontSize: 16,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        child: Stack(
+          children: [
+            Center(
+              child: Text(
+                day.toString(),
+                style: TextStyle(
+                  color: isSelected ? const Color(0xFF2563EB) : Colors.white,
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
             ),
-          ),
+            if (hasJobs && !isSelected)
+              Positioned(
+                bottom: 4,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    width: 3,
+                    height: 3,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

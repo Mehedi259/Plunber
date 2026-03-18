@@ -40,6 +40,7 @@ class RoutePath {
 
   //==================================== Profile screens =====================================
   static const String profile = 'profile';
+  static const String editProfile = 'edit-profile';
   static const String certification = 'certification';
   static const String addCertification = 'add-certification';
   static const String reportIssue = 'report-issue';

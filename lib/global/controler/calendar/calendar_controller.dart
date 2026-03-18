@@ -1,15 +1,14 @@
 import 'package:get/get.dart';
 import '../../service/calendar/calendar_service.dart';
-import '../../service/job/job_service.dart';
 
 class CalendarController extends GetxController {
   final CalendarService _calendarService = CalendarService();
 
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
-  final RxList<JobData> todayJobs = <JobData>[].obs;
-  final RxList<JobData> tomorrowJobs = <JobData>[].obs;
-  final Rx<Map<String, List<JobData>>> thisWeekJobs = Rx<Map<String, List<JobData>>>({});
+  final RxList<CalendarJobData> todayJobs = <CalendarJobData>[].obs;
+  final RxList<CalendarJobData> tomorrowJobs = <CalendarJobData>[].obs;
+  final RxList<CalendarJobData> thisWeekJobs = <CalendarJobData>[].obs;
 
   @override
   void onInit() {
@@ -43,15 +42,7 @@ class CalendarController extends GetxController {
     await fetchCalendarJobs();
   }
 
-  List<JobData> getWeekJobsForDay(String day) {
-    return thisWeekJobs.value[day.toLowerCase()] ?? [];
-  }
-
-  List<JobData> getAllWeekJobs() {
-    final allJobs = <JobData>[];
-    thisWeekJobs.value.forEach((day, jobs) {
-      allJobs.addAll(jobs);
-    });
-    return allJobs;
+  List<CalendarJobData> getAllWeekJobs() {
+    return thisWeekJobs;
   }
 }

@@ -299,31 +299,141 @@ class AuthService {
 
       final responseData = jsonDecode(response.body);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         // Save tokens with remember me enabled by default for registration
         await TokenManager.saveTokens(
-          accessToken: responseData['access_token'],
-          refreshToken: responseData['refresh_token'],
+          accessToken: responseData['access_token'] ?? responseData['access'],
+          refreshToken: responseData['refresh_token'] ?? responseData['refresh'],
           rememberMe: true,
         );
         
-        // Save user data
-        await StorageHelper.saveString(
-          ApiConstants.userDataKey,
-          jsonEncode(responseData['user']),
-        );
+        // Save user data if provided
+        if (responseData['user'] != null) {
+          await StorageHelper.saveString(
+            ApiConstants.userDataKey,
+            jsonEncode(responseData['user']),
+          );
+        }
 
         return {
           'success': true,
-          'message': responseData['message'],
+          'message': responseData['message'] ?? 'Registration successful',
           'user': responseData['user'],
-          'access_token': responseData['access_token'],
-          'refresh_token': responseData['refresh_token'],
         };
       } else {
         return {
           'success': false,
           'message': responseData['message'] ?? 'OTP verification failed',
+          'errors': responseData['errors'] ?? {},
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}',
+      };
+    }
+  }
+
+  // Initiate password reset - sends OTP to email
+  static Future<Map<String, dynamic>> initiatePasswordReset({
+    required String email,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: ApiConstants.passwordResetInitiate,
+        body: {
+          'email': email,
+        },
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': responseData['message'] ?? 'OTP sent to your email',
+          'email': email,
+        };
+      } else {
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'Failed to send OTP',
+          'errors': responseData['errors'] ?? {},
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}',
+      };
+    }
+  }
+
+  // Verify OTP for password reset
+  static Future<Map<String, dynamic>> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: ApiConstants.passwordResetVerify,
+        body: {
+          'email': email,
+          'otp': otp,
+        },
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': responseData['message'] ?? 'OTP verified',
+          'reset_token': responseData['reset_token'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'OTP verification failed',
+          'errors': responseData['errors'] ?? {},
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}',
+      };
+    }
+  }
+
+  // Confirm password reset with new password
+  static Future<Map<String, dynamic>> confirmPasswordReset({
+    required String resetToken,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: ApiConstants.passwordResetConfirm,
+        body: {
+          'reset_token': resetToken,
+          'new_password': newPassword,
+          'confirm_new_password': confirmNewPassword,
+        },
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': responseData['message'] ?? 'Password reset successful',
+        };
+      } else {
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'Password reset failed',
           'errors': responseData['errors'] ?? {},
         };
       }

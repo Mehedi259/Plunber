@@ -6,6 +6,9 @@ class ApiConstants {
   static const String register = '/user/register/';
   static const String registerInitiate = '/user/register/initiate/';
   static const String registerVerify = '/user/register/verify/';
+  static const String passwordResetInitiate = '/user/password-reset/initiate/';
+  static const String passwordResetVerify = '/user/password-reset/verify/';
+  static const String passwordResetConfirm = '/user/password-reset/confirm/';
   static const String tokenRefresh = '/token/refresh/';
   static const String logout = '/user/logout/';
   
@@ -15,6 +18,8 @@ class ApiConstants {
   
   // Job endpoints
   static const String myJobs = '/jobs/my/';
+  static const String myVehicles = '/jobs/employee/my-vehicles/';
+  static const String jobsByDate = '/jobs/employee/jobs-by-date/';
   static String jobDetailsById(String uuid) => '/jobs/employee/$uuid/';
   static const String calendar = '/jobs/employee/calendar/';
   static String startJob(String jobId) => '/jobs/employee/$jobId/start/';
@@ -43,6 +48,7 @@ class ApiConstants {
   static const String terms = '/supports/terms/';
   static const String privacy = '/supports/privacy/';
   static const String submitIssue = '/supports/issues/submit/';
+  static const String submitFeedback = '/supports/feedback/submit/';
   
   // Storage keys
   static const String accessTokenKey = 'access_token';

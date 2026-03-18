@@ -168,8 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 const SizedBox(height: 8),
                                 GestureDetector(
                                   onTap: () {
-                                    // Navigate to edit profile
-                                    // context.pushNamed(RoutePath.editProfile);
+                                    context.pushNamed(RoutePath.editProfile);
                                   },
                                   child: const Text(
                                     'Edit',

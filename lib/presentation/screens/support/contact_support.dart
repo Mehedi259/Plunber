@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import '../../../global/controler/support/support_controller.dart';
 
 class ContactSupportScreen extends StatefulWidget {
   const ContactSupportScreen({Key? key}) : super(key: key);
@@ -15,9 +17,51 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _messageController = TextEditingController();
+  final SupportController _controller = Get.put(SupportController());
   
   String _selectedCountry = 'United States';
   String _selectedLanguage = 'English (US)';
+
+  final List<String> _countries = [
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'Bangladesh',
+    'India',
+    'Pakistan',
+    'Germany',
+    'France',
+    'Spain',
+    'Italy',
+    'Japan',
+    'China',
+    'South Korea',
+    'Brazil',
+    'Mexico',
+    'Argentina',
+    'South Africa',
+    'New Zealand',
+    'Singapore',
+  ];
+
+  final List<String> _languages = [
+    'English (US)',
+    'English (UK)',
+    'Spanish',
+    'French',
+    'German',
+    'Italian',
+    'Portuguese',
+    'Chinese',
+    'Japanese',
+    'Korean',
+    'Hindi',
+    'Bengali',
+    'Urdu',
+    'Arabic',
+    'Russian',
+  ];
 
   @override
   void dispose() {
@@ -27,6 +71,33 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
     _phoneController.dispose();
     _messageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submitFeedback() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final success = await _controller.submitFeedback(
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      email: _emailController.text.trim(),
+      phone: _phoneController.text.trim(),
+      country: _selectedCountry,
+      language: _selectedLanguage,
+      message: _messageController.text.trim(),
+    );
+
+    if (success && mounted) {
+      _showSuccessDialog(context);
+    } else if (mounted && _controller.errorMessage.value.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_controller.errorMessage.value),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -80,6 +151,12 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'First name is required';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 20),
 
@@ -91,6 +168,38 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _lastNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Your last name',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Last name is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Email
+                const Text(
+                  'Email',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'name@example.com',
                     filled: true,
@@ -105,31 +214,15 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),
-                ),
-                const SizedBox(height: 20),
-
-                // Email
-                const Text(
-                  'Email',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: '+1(646) 786-5060',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    contentPadding: const EdgeInsets.all(16),
-                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Email is required';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 20),
 
@@ -141,6 +234,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _phoneController,
+                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     hintText: '+(12) 345 6789',
                     filled: true,
@@ -170,7 +264,15 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                _buildDropdownField(_selectedCountry),
+                _buildDropdownField(
+                  value: _selectedCountry,
+                  items: _countries,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCountry = value!;
+                    });
+                  },
+                ),
                 const SizedBox(height: 20),
 
                 // Select Language
@@ -185,7 +287,15 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                _buildDropdownField(_selectedLanguage),
+                _buildDropdownField(
+                  value: _selectedLanguage,
+                  items: _languages,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedLanguage = value!;
+                    });
+                  },
+                ),
                 const SizedBox(height: 20),
 
                 // Your Message
@@ -210,6 +320,12 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Message is required';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 20),
 
@@ -242,12 +358,8 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 // Submit Button
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _showSuccessDialog(context);
-                      }
-                    },
+                  child: Obx(() => ElevatedButton(
+                    onPressed: _controller.isLoading.value ? null : _submitFeedback,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2563EB),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -255,15 +367,24 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      'Submit feedback',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                    child: _controller.isLoading.value
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Submit feedback',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                  )),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -274,24 +395,34 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
     );
   }
 
-  Widget _buildDropdownField(String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(8),
+  Widget _buildDropdownField({
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14),
-          ),
-          const Icon(Icons.keyboard_arrow_down, size: 20),
-        ],
-      ),
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      icon: const Icon(Icons.keyboard_arrow_down, size: 20),
     );
   }
 

@@ -98,6 +98,8 @@ class SupportController extends GetxController {
     File? photo1,
     File? photo2,
     File? photo3,
+    File? photo4,
+    File? photo5,
   }) async {
     if (title.isEmpty || description.isEmpty) {
       errorMessage.value = 'Title and description are required';
@@ -114,6 +116,51 @@ class SupportController extends GetxController {
         photo1: photo1,
         photo2: photo2,
         photo3: photo3,
+        photo4: photo4,
+        photo5: photo5,
+      );
+
+      if (response.success) {
+        isLoading.value = false;
+        return true;
+      } else {
+        errorMessage.value = response.message;
+        isLoading.value = false;
+        return false;
+      }
+    } catch (e) {
+      errorMessage.value = 'An error occurred: ${e.toString()}';
+      isLoading.value = false;
+      return false;
+    }
+  }
+
+  Future<bool> submitFeedback({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    required String country,
+    required String language,
+    required String message,
+  }) async {
+    if (firstName.isEmpty || lastName.isEmpty || email.isEmpty || message.isEmpty) {
+      errorMessage.value = 'Please fill in all required fields';
+      return false;
+    }
+
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    try {
+      final response = await _supportService.submitFeedback(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        country: country,
+        language: language,
+        message: message,
       );
 
       if (response.success) {

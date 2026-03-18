@@ -6,12 +6,7 @@ import '../../widgets/animated_section.dart';
 import '../../../global/controler/vehicle/vehicle_controller.dart';
 
 class VehicleScreen extends StatefulWidget {
-  final String vehicleId;
-  
-  const VehicleScreen({
-    Key? key,
-    required this.vehicleId,
-  }) : super(key: key);
+  const VehicleScreen({super.key});
 
   @override
   State<VehicleScreen> createState() => _VehicleScreenState();
@@ -19,12 +14,6 @@ class VehicleScreen extends StatefulWidget {
 
 class _VehicleScreenState extends State<VehicleScreen> {
   final _vehicleController = Get.put(VehicleController());
-
-  @override
-  void initState() {
-    super.initState();
-    _vehicleController.fetchVehicleDetails(widget.vehicleId);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +41,7 @@ class _VehicleScreenState extends State<VehicleScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => _vehicleController.fetchVehicleDetails(widget.vehicleId),
+                    onPressed: () => _vehicleController.fetchMyVehicles(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -68,7 +57,7 @@ class _VehicleScreenState extends State<VehicleScreen> {
           }
 
           return RefreshIndicator(
-            onRefresh: () => _vehicleController.refreshVehicle(widget.vehicleId),
+            onRefresh: () => _vehicleController.fetchMyVehicles(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -238,7 +227,14 @@ class _VehicleScreenState extends State<VehicleScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          context.pushNamed(RoutePath.inspection);
+                          context.pushNamed(
+                            RoutePath.inspection,
+                            queryParameters: {
+                              'vehicleId': vehicle.id,
+                              'vehicleName': vehicle.name,
+                              'vehiclePlate': vehicle.plate,
+                            },
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2563EB),
@@ -261,182 +257,12 @@ class _VehicleScreenState extends State<VehicleScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // Inspection History
-                  AnimatedSection(
-                    index: 8,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 20,
-                            offset: const Offset(0, 4),
-                            spreadRadius: 0,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Inspection History',
-                                style: TextStyle(
-                                  color: Color(0xFF323232),
-                                  fontSize: 18,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  context.pushNamed(RoutePath.inspectionHistory);
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  minimumSize: const Size(0, 0),
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Row(
-                                  children: [
-                                    Text(
-                                      'View All',
-                                      style: TextStyle(
-                                        color: Color(0xFF2563EB),
-                                        fontSize: 14,
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Color(0xFF2563EB),
-                                      size: 14,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          if (vehicle.maintenanceHistory.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text(
-                                'No maintenance history available',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            )
-                          else
-                            ...vehicle.maintenanceHistory.take(3).map((history) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: _buildHistoryItem(
-                                  history.getFormattedDate(),
-                                  history.getStatusText(),
-                                  history.isComplete(),
-                                ),
-                              );
-                            }).toList(),
-                        ],
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 100),
                 ],
               ),
             ),
           );
         }),
-      ),
-    );
-  }
-
-  Widget _buildHistoryItem(String date, String status, bool isComplete) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE5E7EB),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          // Date Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: const Color(0xFFE5E7EB),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              date,
-              style: const TextStyle(
-                color: Color(0xFF323232),
-                fontSize: 14,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Status with Icon
-          Expanded(
-            child: Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: isComplete ? const Color(0xFF10B981) : const Color(0xFFEF4444),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    status,
-                    style: TextStyle(
-                      color: isComplete ? const Color(0xFF10B981) : const Color(0xFFEF4444),
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Arrow Icon
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE5E7EB),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: const Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: Color(0xFF6B7280),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -22,6 +22,7 @@ import '../../presentation/screens/vehicle/inspection_history.dart';
 import '../../presentation/screens/profile/certifiction.dart';
 import '../../presentation/screens/profile/add_cirtification.dart';
 import '../../presentation/screens/profile/Report_issue.dart';
+import '../../presentation/screens/profile/edit_profile.dart';
 import '../../presentation/screens/support/faqs.dart';
 import '../../presentation/screens/support/contact_support.dart';
 import '../../presentation/screens/support/privacy_policy.dart';
@@ -197,6 +198,11 @@ class AppRouter {
       ),
 
       // ================== Profile ==================
+      GoRoute(
+        name: RoutePath.editProfile,
+        path: RoutePath.editProfile.addBasePath,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
       GoRoute(
         name: RoutePath.certification,
         path: RoutePath.certification.addBasePath,

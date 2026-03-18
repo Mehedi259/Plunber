@@ -3,6 +3,39 @@ import '../../constant/api_constant.dart';
 import '../api_services.dart';
 
 class VehicleService {
+  Future<MyVehiclesResponse> getMyVehicles() async {
+    try {
+      final response = await ApiService.get(
+        endpoint: ApiConstants.myVehicles,
+        includeAuth: true,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        final vehicles = data.map((json) => VehicleData.fromJson(json)).toList();
+        
+        return MyVehiclesResponse(
+          success: true,
+          message: 'Vehicles fetched successfully',
+          vehicles: vehicles,
+        );
+      } else {
+        final error = jsonDecode(response.body);
+        return MyVehiclesResponse(
+          success: false,
+          message: error['message'] ?? 'Failed to fetch vehicles',
+          vehicles: [],
+        );
+      }
+    } catch (e) {
+      return MyVehiclesResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+        vehicles: [],
+      );
+    }
+  }
+
   Future<VehicleResponse> getVehicleDetails(String vehicleId) async {
     try {
       final response = await ApiService.get(
@@ -51,32 +84,18 @@ class VehicleData {
   final String name;
   final String plate;
   final String status;
-  final String make;
-  final String modelName;
-  final int year;
-  final String? image;
-  final int currentOdometerKm;
-  final int nextServiceKm;
-  final int kmUntilService;
+  final String? picture;
+  final int nextService;
   final String lastInspectionDate;
-  final String? notes;
-  final List<MaintenanceHistory> maintenanceHistory;
 
   VehicleData({
     required this.id,
     required this.name,
     required this.plate,
     required this.status,
-    required this.make,
-    required this.modelName,
-    required this.year,
-    this.image,
-    required this.currentOdometerKm,
-    required this.nextServiceKm,
-    required this.kmUntilService,
+    this.picture,
+    required this.nextService,
     required this.lastInspectionDate,
-    this.notes,
-    required this.maintenanceHistory,
   });
 
   factory VehicleData.fromJson(Map<String, dynamic> json) {
@@ -85,20 +104,17 @@ class VehicleData {
       name: json['name'] ?? '',
       plate: json['plate'] ?? '',
       status: json['status'] ?? '',
-      make: json['make'] ?? '',
-      modelName: json['model_name'] ?? '',
-      year: json['year'] ?? 0,
-      image: json['image'],
-      currentOdometerKm: json['current_odometer_km'] ?? 0,
-      nextServiceKm: json['next_service_km'] ?? 0,
-      kmUntilService: json['km_until_service'] ?? 0,
+      picture: json['picture'],
+      nextService: json['next_service'] ?? 0,
       lastInspectionDate: json['last_inspection_date'] ?? '',
-      notes: json['notes'],
-      maintenanceHistory: (json['maintenance_history'] as List?)
-          ?.map((history) => MaintenanceHistory.fromJson(history))
-          .toList() ?? [],
     );
   }
+
+  String? get image => picture;
+  
+  double get kmUntilService => nextService.toDouble();
+  
+  List<MaintenanceHistory> get maintenanceHistory => [];
 
   String getFormattedLastInspection() {
     try {
@@ -114,19 +130,21 @@ class VehicleData {
   }
 
   bool isInspectionRequired() {
-    return status.toLowerCase() == 'inspection_due';
+    return status.toLowerCase() == 'inspection_due' || status.toLowerCase() == 'issue_reported';
   }
 
   String getStatusText() {
     switch (status.toLowerCase()) {
       case 'inspection_due':
         return 'Inspection Required';
+      case 'issue_reported':
+        return 'Issue Reported';
       case 'active':
         return 'Active';
       case 'maintenance':
         return 'Under Maintenance';
       default:
-        return status;
+        return status.replaceAll('_', ' ').toUpperCase();
     }
   }
 }
@@ -180,4 +198,16 @@ class MaintenanceHistory {
   bool isComplete() {
     return status.toLowerCase() == 'completed';
   }
+}
+
+class MyVehiclesResponse {
+  final bool success;
+  final String message;
+  final List<VehicleData> vehicles;
+
+  MyVehiclesResponse({
+    required this.success,
+    required this.message,
+    required this.vehicles,
+  });
 }
