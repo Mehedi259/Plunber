@@ -1,8 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import '../../../global/service/vehicle/vehicle_service.dart';
 
-class InspectionHistoryScreen extends StatelessWidget {
-  const InspectionHistoryScreen({super.key});
+class InspectionHistoryScreen extends StatefulWidget {
+  final String vehicleId;
+  final String vehicleName;
+  final String vehiclePlate;
+
+  const InspectionHistoryScreen({
+    super.key,
+    required this.vehicleId,
+    required this.vehicleName,
+    required this.vehiclePlate,
+  });
+
+  @override
+  State<InspectionHistoryScreen> createState() => _InspectionHistoryScreenState();
+}
+
+class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
+  final VehicleService _vehicleService = VehicleService();
+  final RxBool isLoading = true.obs;
+  final RxString errorMessage = ''.obs;
+  final RxList<InspectionHistoryData> inspections = <InspectionHistoryData>[].obs;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchInspectionHistory();
+  }
+
+  Future<void> _fetchInspectionHistory() async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    try {
+      final response = await _vehicleService.getInspectionHistory(widget.vehicleId);
+
+      if (response.success) {
+        inspections.value = response.inspections;
+      } else {
+        errorMessage.value = response.message;
+      }
+    } catch (e) {
+      errorMessage.value = 'An error occurred: ${e.toString()}';
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,64 +72,75 @@ class InspectionHistoryScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildHistoryItem(
-            context,
-            'Jan 10',
-            'Complete',
-            true,
+      body: Obx(() {
+        if (isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF2563EB),
+            ),
+          );
+        }
+
+        if (errorMessage.value.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  errorMessage.value,
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _fetchInspectionHistory,
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (inspections.isEmpty) {
+          return const Center(
+            child: Text(
+              'No inspection history available',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF6B7280),
+              ),
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: _fetchInspectionHistory,
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: inspections.length,
+            itemBuilder: (context, index) {
+              final inspection = inspections[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildHistoryItem(
+                  context,
+                  inspection,
+                ),
+              );
+            },
           ),
-          const SizedBox(height: 12),
-          _buildHistoryItem(
-            context,
-            'Jan 20',
-            'Issue Reported',
-            false,
-          ),
-          const SizedBox(height: 12),
-          _buildHistoryItem(
-            context,
-            'Feb 8',
-            'Complete',
-            true,
-          ),
-          const SizedBox(height: 12),
-          _buildHistoryItem(
-            context,
-            'Feb 10',
-            'Issue Reported',
-            false,
-          ),
-          const SizedBox(height: 12),
-          _buildHistoryItem(
-            context,
-            'Feb 13',
-            'Issue Reported',
-            false,
-          ),
-          const SizedBox(height: 12),
-          _buildHistoryItem(
-            context,
-            'Feb 14',
-            'Complete',
-            true,
-          ),
-        ],
-      ),
+        );
+      }),
     );
   }
 
   Widget _buildHistoryItem(
     BuildContext context,
-    String date,
-    String status,
-    bool isComplete,
+    InspectionHistoryData inspection,
   ) {
     return InkWell(
       onTap: () {
-        _showInspectionDetails(context, date, status, isComplete);
+        _showInspectionDetails(context, inspection);
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -117,7 +174,7 @@ class InspectionHistoryScreen extends StatelessWidget {
                 ),
               ),
               child: Text(
-                date,
+                inspection.getFormattedDate(),
                 style: const TextStyle(
                   color: Color(0xFF323232),
                   fontSize: 14,
@@ -135,16 +192,16 @@ class InspectionHistoryScreen extends StatelessWidget {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: isComplete ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                      color: inspection.isComplete() ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      status,
+                      inspection.getStatusText(),
                       style: TextStyle(
-                        color: isComplete ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                        color: inspection.isComplete() ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                         fontSize: 14,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
@@ -175,9 +232,7 @@ class InspectionHistoryScreen extends StatelessWidget {
 
   void _showInspectionDetails(
     BuildContext context,
-    String date,
-    String status,
-    bool isComplete,
+    InspectionHistoryData inspection,
   ) {
     showModalBottomSheet(
       context: context,
@@ -213,7 +268,7 @@ class InspectionHistoryScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Inspection - $date',
+                          'Inspection - ${inspection.getFormattedDate()}',
                           style: const TextStyle(
                             fontSize: 20,
                             fontFamily: 'Poppins',
@@ -224,7 +279,7 @@ class InspectionHistoryScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: isComplete 
+                            color: inspection.isComplete() 
                                 ? const Color(0xFFD1FAE5) 
                                 : const Color(0xFFFEE2E2),
                             borderRadius: BorderRadius.circular(20),
@@ -236,7 +291,7 @@ class InspectionHistoryScreen extends StatelessWidget {
                                 width: 6,
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: isComplete 
+                                  color: inspection.isComplete() 
                                       ? const Color(0xFF10B981) 
                                       : const Color(0xFFEF4444),
                                   shape: BoxShape.circle,
@@ -244,11 +299,11 @@ class InspectionHistoryScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                status,
+                                inspection.getStatusText(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontFamily: 'Poppins',
-                                  color: isComplete 
+                                  color: inspection.isComplete() 
                                       ? const Color(0xFF10B981) 
                                       : const Color(0xFFEF4444),
                                   fontWeight: FontWeight.w600,
@@ -285,19 +340,19 @@ class InspectionHistoryScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          _buildDetailRow('Vehicle', 'Truck 12'),
+                          _buildDetailRow('Vehicle', inspection.vehicleName),
                           const SizedBox(height: 12),
-                          _buildDetailRow('Number Plate', 'ABC-1234'),
+                          _buildDetailRow('Number Plate', inspection.vehiclePlate),
                           const SizedBox(height: 12),
-                          _buildDetailRow('Inspector', 'John Doe'),
+                          _buildDetailRow('Inspector', inspection.inspectedByName),
                           const SizedBox(height: 12),
-                          _buildDetailRow('Time', '8:30 AM'),
+                          _buildDetailRow('Time', inspection.getFormattedDateTime()),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
                     const Text(
-                      'Inspection Items',
+                      'Inspection Summary',
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: 'Poppins',
@@ -317,19 +372,17 @@ class InspectionHistoryScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          _buildInspectionItemRow('Lights', !isComplete),
-                          _buildInspectionItemRow('Tires', true),
-                          _buildInspectionItemRow('Breaks', true),
-                          _buildInspectionItemRow('Fluid Levels', true),
-                          _buildInspectionItemRow('Mirrors', true),
-                          _buildInspectionItemRow('Horn', true),
-                          _buildInspectionItemRow('Windshield & Wipers', true),
-                          _buildInspectionItemRow('Dashboard Warning Lights', true),
-                          _buildInspectionItemRow('Body Exterior', true, isLast: true),
+                          _buildDetailRow('Completed Items', '${inspection.completedItemsCount}'),
+                          const SizedBox(height: 12),
+                          _buildDetailRow('Issues Reported', '${inspection.issueCount}'),
+                          if (inspection.notes.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            _buildDetailRow('Notes', inspection.notes),
+                          ],
                         ],
                       ),
                     ),
-                    if (!isComplete) ...[
+                    if (!inspection.isComplete()) ...[
                       const SizedBox(height: 24),
                       const Text(
                         'Issues Reported',
@@ -360,9 +413,9 @@ class InspectionHistoryScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: const Text(
-                                'Left break light is not working properly',
-                                style: TextStyle(
+                              child: Text(
+                                '${inspection.issueCount} issue(s) found during inspection',
+                                style: const TextStyle(
                                   fontSize: 14,
                                   fontFamily: 'Poppins',
                                   color: Color(0xFF991B1B),
@@ -388,6 +441,7 @@ class InspectionHistoryScreen extends StatelessWidget {
   Widget _buildDetailRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
@@ -398,65 +452,20 @@ class InspectionHistoryScreen extends StatelessWidget {
             fontWeight: FontWeight.w400,
           ),
         ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF323232),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF323232),
+            ),
+            textAlign: TextAlign.right,
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildInspectionItemRow(String item, bool passed, {bool isLast = false}) {
-    return Container(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
-      decoration: BoxDecoration(
-        border: isLast ? null : const Border(
-          bottom: BorderSide(
-            color: Color(0xFFF3F4F6),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: passed 
-                    ? const Color(0xFFD1FAE5) 
-                    : const Color(0xFFFEE2E2),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Icon(
-                passed ? Icons.check : Icons.close,
-                color: passed 
-                    ? const Color(0xFF10B981) 
-                    : const Color(0xFFEF4444),
-                size: 16,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                item,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
-                  color: Color(0xFF323232),
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

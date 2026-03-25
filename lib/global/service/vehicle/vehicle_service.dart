@@ -65,6 +65,40 @@ class VehicleService {
       );
     }
   }
+
+  Future<InspectionHistoryResponse> getInspectionHistory(String vehicleId) async {
+    try {
+      final response = await ApiService.get(
+        endpoint: ApiConstants.inspectionHistory(vehicleId),
+        includeAuth: true,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> results = data['results'] ?? [];
+        final inspections = results.map((json) => InspectionHistoryData.fromJson(json)).toList();
+        
+        return InspectionHistoryResponse(
+          success: true,
+          message: 'Inspection history fetched successfully',
+          inspections: inspections,
+        );
+      } else {
+        final error = jsonDecode(response.body);
+        return InspectionHistoryResponse(
+          success: false,
+          message: error['message'] ?? 'Failed to fetch inspection history',
+          inspections: [],
+        );
+      }
+    } catch (e) {
+      return InspectionHistoryResponse(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+        inspections: [],
+      );
+    }
+  }
 }
 
 class VehicleResponse {
@@ -210,4 +244,93 @@ class MyVehiclesResponse {
     required this.message,
     required this.vehicles,
   });
+}
+
+class InspectionHistoryResponse {
+  final bool success;
+  final String message;
+  final List<InspectionHistoryData> inspections;
+
+  InspectionHistoryResponse({
+    required this.success,
+    required this.message,
+    required this.inspections,
+  });
+}
+
+class InspectionHistoryData {
+  final String id;
+  final String vehicle;
+  final String vehicleName;
+  final String vehiclePlate;
+  final String inspectedBy;
+  final String inspectedByName;
+  final bool hasOpenIssue;
+  final int issueCount;
+  final int completedItemsCount;
+  final String notes;
+  final String inspectedAt;
+
+  InspectionHistoryData({
+    required this.id,
+    required this.vehicle,
+    required this.vehicleName,
+    required this.vehiclePlate,
+    required this.inspectedBy,
+    required this.inspectedByName,
+    required this.hasOpenIssue,
+    required this.issueCount,
+    required this.completedItemsCount,
+    required this.notes,
+    required this.inspectedAt,
+  });
+
+  factory InspectionHistoryData.fromJson(Map<String, dynamic> json) {
+    return InspectionHistoryData(
+      id: json['id'] ?? '',
+      vehicle: json['vehicle'] ?? '',
+      vehicleName: json['vehicle_name'] ?? '',
+      vehiclePlate: json['vehicle_plate'] ?? '',
+      inspectedBy: json['inspected_by'] ?? '',
+      inspectedByName: json['inspected_by_name'] ?? '',
+      hasOpenIssue: json['has_open_issue'] ?? false,
+      issueCount: json['issue_count'] ?? 0,
+      completedItemsCount: json['completed_items_count'] ?? 0,
+      notes: json['notes'] ?? '',
+      inspectedAt: json['inspected_at'] ?? '',
+    );
+  }
+
+  String getFormattedDate() {
+    try {
+      final dateTime = DateTime.parse(inspectedAt);
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${months[dateTime.month - 1]} ${dateTime.day}';
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
+  String getFormattedDateTime() {
+    try {
+      final dateTime = DateTime.parse(inspectedAt);
+      final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
+      final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+      return '${hour == 0 ? 12 : hour}:${dateTime.minute.toString().padLeft(2, '0')} $period';
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
+  String getStatusText() {
+    if (hasOpenIssue) {
+      return 'Issue Reported';
+    }
+    return 'Complete';
+  }
+
+  bool isComplete() {
+    return !hasOpenIssue;
+  }
 }

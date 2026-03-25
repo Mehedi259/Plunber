@@ -256,6 +256,46 @@ class _VehicleScreenState extends State<VehicleScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  // Inspection History Button
+                  AnimatedSection(
+                    index: 8,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 47),
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          context.pushNamed(
+                            RoutePath.inspectionHistory,
+                            queryParameters: {
+                              'vehicleId': vehicle.id,
+                              'vehicleName': vehicle.name,
+                              'vehiclePlate': vehicle.plate,
+                            },
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          side: const BorderSide(
+                            color: Color(0xFF2563EB),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: const Text(
+                          'Inspection History',
+                          style: TextStyle(
+                            color: Color(0xFF2563EB),
+                            fontSize: 16,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 40),
                   const SizedBox(height: 100),
                 ],
