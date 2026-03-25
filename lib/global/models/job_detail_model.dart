@@ -11,6 +11,7 @@ class JobDetailModel {
   final VehicleInfo? vehicle;
   final List<ReportInfo> reports;
   final List<AttachmentInfo> attachments;
+  final List<String> safetyFormIds;
   final int grandTotal;
   final bool isOverdue;
   final bool hasFleetIssue;
@@ -28,6 +29,7 @@ class JobDetailModel {
     this.vehicle,
     required this.reports,
     required this.attachments,
+    required this.safetyFormIds,
     required this.grandTotal,
     required this.isOverdue,
     required this.hasFleetIssue,
@@ -42,12 +44,18 @@ class JobDetailModel {
       jobName: json['job_name'] ?? '',
       jobDetails: json['job_details'] ?? '',
       scheduledDatetime: json['scheduled_datetime'] ?? '',
-      client: ClientInfo.fromJson(json['client'] ?? {}),
-      assignedTo: json['assigned_to'] != null
-          ? AssignedEmployee.fromJson(json['assigned_to'])
+      client: ClientInfo.fromJson(json['client_info'] ?? {}),
+      assignedTo: json['assigned_employee_info'] != null
+          ? AssignedEmployee.fromJson(json['assigned_employee_info'])
           : null,
-      vehicle: json['vehicle'] != null
-          ? VehicleInfo.fromJson(json['vehicle'])
+      vehicle: (json['vehicle_name'] != null && json['vehicle_plate'] != null)
+          ? VehicleInfo(
+              id: '',
+              name: json['vehicle_name'] ?? '',
+              plate: json['vehicle_plate'] ?? '',
+              picture: null,
+              status: '',
+            )
           : null,
       reports: (json['reports'] as List?)
               ?.map((r) => ReportInfo.fromJson(r))
@@ -55,6 +63,10 @@ class JobDetailModel {
           [],
       attachments: (json['attachments'] as List?)
               ?.map((a) => AttachmentInfo.fromJson(a))
+              .toList() ??
+          [],
+      safetyFormIds: (json['safety_form_ids'] as List?)
+              ?.map((id) => id.toString())
               .toList() ??
           [],
       grandTotal: json['grand_total'] ?? 0,

@@ -140,7 +140,12 @@ class AppRouter {
         builder: (context, state) {
           final jobId = state.uri.queryParameters['jobId'] ?? '';
           final address = state.uri.queryParameters['address'] ?? '';
-          return SafetyCheckRequiredScreen(jobId: jobId, address: address);
+          final templateId = state.uri.queryParameters['templateId'];
+          return SafetyCheckRequiredScreen(
+            jobId: jobId,
+            address: address,
+            templateId: templateId,
+          );
         },
       ),
       GoRoute(

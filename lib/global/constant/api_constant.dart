@@ -36,6 +36,10 @@ class ApiConstants {
   static String inspectionDetails(String inspectionId) => '/inspections/$inspectionId/';
   static String submitInspection(String vehicleId) => '/inspections/vehicle/$vehicleId/submit/';
   
+  // Safety Form endpoints
+  static String safetyFormTemplate(String jobId, String templateId) => '/safety-forms/job/$jobId/template/$templateId/';
+  static String submitSafetyForm(String jobId, String templateId) => '/safety-forms/job/$jobId/template/$templateId/submit/';
+  
   // Profile endpoints
   static const String employeeProfile = '/user/me/employee-profile/';
   static const String updateProfile = '/user/me/employee-profile/update/';
