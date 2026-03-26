@@ -8,87 +8,33 @@ import '../api_services.dart';
 class JobService {
   Future<JobsResponse> getMyJobs() async {
     try {
-      log('Fetching jobs from: ${ApiConstants.myJobs}');
+      log('Fetching jobs with server-side filtering');
       
-      final response = await ApiService.get(
-        endpoint: ApiConstants.myJobs,
-        includeAuth: true,
+      // Fetch jobs for each category using server-side filtering
+      final todayJobsFuture = _fetchJobsByFilter('today');
+      final upcomingJobsFuture = _fetchJobsByFilter('upcoming');
+      final completedJobsFuture = _fetchJobsByFilter('completed');
+      
+      // Wait for all requests to complete
+      final results = await Future.wait([
+        todayJobsFuture,
+        upcomingJobsFuture,
+        completedJobsFuture,
+      ]);
+      
+      final todayJobs = results[0];
+      final upcomingJobs = results[1];
+      final completedJobs = results[2];
+      
+      log('Final counts - Today: ${todayJobs.length}, Upcoming: ${upcomingJobs.length}, Completed: ${completedJobs.length}');
+      
+      return JobsResponse(
+        success: true,
+        message: 'Jobs fetched successfully',
+        todayJobs: todayJobs,
+        upcomingJobs: upcomingJobs,
+        completedJobs: completedJobs,
       );
-
-      log('Jobs API response status: ${response.statusCode}');
-      log('Jobs API response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        log('Parsed jobs data: $data');
-        
-        // Parse paginated response
-        final results = (data['results'] as List?)
-            ?.map((job) => JobData.fromJson(job))
-            .toList() ?? [];
-        
-        log('Total jobs from API: ${results.length}');
-        
-        // Categorize jobs by date and status
-        final now = DateTime.now();
-        final today = DateTime(now.year, now.month, now.day);
-        final tomorrow = today.add(const Duration(days: 1));
-        
-        final todayJobs = <JobData>[];
-        final upcomingJobs = <JobData>[];
-        final completedJobs = <JobData>[];
-        
-        for (var job in results) {
-          log('Processing job: ${job.jobId}, status: ${job.status}, scheduled: ${job.scheduledDatetime}');
-          
-          if (job.status.toLowerCase() == 'completed') {
-            completedJobs.add(job);
-            log('Added to completed: ${job.jobId}');
-          } else {
-            try {
-              final scheduledDate = DateTime.parse(job.scheduledDatetime);
-              final jobDate = DateTime(scheduledDate.year, scheduledDate.month, scheduledDate.day);
-              
-              log('Job date: $jobDate, Today: $today');
-              
-              if (jobDate.isAtSameMomentAs(today)) {
-                todayJobs.add(job);
-                log('Added to today: ${job.jobId}');
-              } else if (jobDate.isAfter(today)) {
-                upcomingJobs.add(job);
-                log('Added to upcoming: ${job.jobId}');
-              } else {
-                // Past jobs that aren't completed
-                todayJobs.add(job);
-                log('Added to today (overdue): ${job.jobId}');
-              }
-            } catch (e) {
-              // If date parsing fails, add to upcoming
-              upcomingJobs.add(job);
-              log('Date parse error, added to upcoming: ${job.jobId}');
-            }
-          }
-        }
-        
-        log('Final counts - Today: ${todayJobs.length}, Upcoming: ${upcomingJobs.length}, Completed: ${completedJobs.length}');
-        
-        return JobsResponse(
-          success: true,
-          message: 'Jobs fetched successfully',
-          todayJobs: todayJobs,
-          upcomingJobs: upcomingJobs,
-          completedJobs: completedJobs,
-        );
-      } else {
-        final error = jsonDecode(response.body);
-        return JobsResponse(
-          success: false,
-          message: error['message'] ?? 'Failed to fetch jobs',
-          todayJobs: [],
-          upcomingJobs: [],
-          completedJobs: [],
-        );
-      }
     } catch (e) {
       log('Jobs API error: $e');
       return JobsResponse(
@@ -98,6 +44,37 @@ class JobService {
         upcomingJobs: [],
         completedJobs: [],
       );
+    }
+  }
+
+  Future<List<JobData>> _fetchJobsByFilter(String filter) async {
+    try {
+      log('Fetching jobs with filter: $filter');
+      
+      final response = await ApiService.get(
+        endpoint: '${ApiConstants.myJobs}?filter=$filter',
+        includeAuth: true,
+      );
+
+      log('Jobs API ($filter) response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // Parse paginated response
+        final results = (data['results'] as List?)
+            ?.map((job) => JobData.fromJson(job))
+            .toList() ?? [];
+        
+        log('Total $filter jobs from API: ${results.length}');
+        return results;
+      } else {
+        log('Failed to fetch $filter jobs: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      log('Error fetching $filter jobs: $e');
+      return [];
     }
   }
 
@@ -277,9 +254,10 @@ class JobData {
       ),
       scheduledDatetime: json['scheduled_datetime'] ?? '',
       status: json['status'] ?? 'pending',
-      vehicle: json['vehicle'] != null 
-          ? VehicleData.fromJson(json['vehicle']) 
-          : VehicleData(vehicleNumber: 'N/A', name: 'No Vehicle'),
+      vehicle: VehicleData(
+        vehicleNumber: json['vehicle_plate'] ?? 'N/A',
+        name: json['vehicle_name'] ?? 'No Vehicle',
+      ),
     );
   }
 
@@ -349,11 +327,4 @@ class VehicleData {
     required this.vehicleNumber,
     required this.name,
   });
-
-  factory VehicleData.fromJson(Map<String, dynamic> json) {
-    return VehicleData(
-      vehicleNumber: json['vehicle_number'] ?? 'Unknown',
-      name: json['name'] ?? 'Unknown',
-    );
-  }
 }
