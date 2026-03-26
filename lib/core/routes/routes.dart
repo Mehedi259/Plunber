@@ -19,6 +19,9 @@ import '../../presentation/screens/job/problem_submit.dart';
 import '../../presentation/screens/job/problem_details_screen.dart';
 import '../../presentation/screens/vehicle/inspection.dart';
 import '../../presentation/screens/vehicle/inspection_history.dart';
+import '../../presentation/screens/job/reports_list_screen.dart';
+import '../../presentation/screens/job/report_form_screen.dart';
+import '../../global/models/job_detail_model.dart';
 import '../../presentation/screens/profile/certifiction.dart';
 import '../../presentation/screens/profile/add_cirtification.dart';
 import '../../presentation/screens/profile/Report_issue.dart';
@@ -132,6 +135,30 @@ class AppRouter {
         builder: (context, state) {
           final jobId = state.uri.queryParameters['jobId'] ?? '';
           return JobDetailsScreen(jobId: jobId);
+        },
+      ),
+      GoRoute(
+        name: RoutePath.reportsList,
+        path: RoutePath.reportsList.addBasePath,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final jobId = extra['jobId'] as String;
+          final reports = extra['reports'] as List<ReportInfo>;
+          return ReportsListScreen(jobId: jobId, reports: reports);
+        },
+      ),
+      GoRoute(
+        name: RoutePath.reportForm,
+        path: RoutePath.reportForm.addBasePath,
+        builder: (context, state) {
+          final jobReportId = state.uri.queryParameters['jobReportId'] ?? '';
+          final reportType = state.uri.queryParameters['reportType'] ?? '';
+          final reportTypeDisplay = state.uri.queryParameters['reportTypeDisplay'] ?? '';
+          return ReportFormScreen(
+            jobReportId: jobReportId,
+            reportType: reportType,
+            reportTypeDisplay: reportTypeDisplay,
+          );
         },
       ),
       GoRoute(

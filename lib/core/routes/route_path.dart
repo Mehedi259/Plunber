@@ -22,6 +22,8 @@ class RoutePath {
   static const String startJob = 'start-job';
   static const String problemSubmit = 'problem-submit';
   static const String problemDetails = 'problem-details';
+  static const String reportsList = 'reports-list';
+  static const String reportForm = 'report-form';
 
   //==================================== Profile Setup screens =====================================
   static const String profileSetup = 'profile-setup';

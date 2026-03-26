@@ -403,6 +403,37 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                             ),
                           ),
                         const SizedBox(height: 12),
+                        // Reports & Notes button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.pushNamed(
+                                RoutePath.reportsList,
+                                extra: {
+                                  'jobId': job.id,
+                                  'reports': job.reports,
+                                },
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFEF4444),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Reports & Notes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
