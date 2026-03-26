@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/route_path.dart';
-import '../../widgets/custom_navigation/custom_navbar.dart';
 import '../../widgets/animated_section.dart';
 import '../../../global/controler/job/job_controller.dart';
+import '../../../global/controler/notification/notification_controller.dart';
 import '../../../global/service/job/job_service.dart';
 
 class JobScreen extends StatefulWidget {
@@ -17,6 +17,7 @@ class JobScreen extends StatefulWidget {
 class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _jobController = Get.put(JobController());
+  final _notificationController = Get.put(NotificationController());
 
   @override
   void initState() {
@@ -60,12 +61,45 @@ class _JobScreenState extends State<JobScreen> with SingleTickerProviderStateMix
                         ),
                         borderRadius: BorderRadius.circular(22),
                       ),
-                      child: IconButton(
-                        icon: const Icon(Icons.notifications_outlined, size: 24),
-                        onPressed: () {
-                          context.pushNamed(RoutePath.notification);
-                        },
-                        padding: EdgeInsets.zero,
+                      child: Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.notifications_outlined, size: 24),
+                            onPressed: () {
+                              context.pushNamed(RoutePath.notification);
+                            },
+                            padding: EdgeInsets.zero,
+                          ),
+                          Obx(() {
+                            final unreadCount = _notificationController.unreadCount.value;
+                            if (unreadCount == 0) return const SizedBox.shrink();
+                            
+                            return Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  unreadCount > 9 ? '9+' : unreadCount.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       ),
                     ),
                   ],

@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 import '../../service/job/job_service.dart';
+import '../../service/notification/notification_service.dart';
 
 class JobController extends GetxController {
   final JobService _jobService = JobService();
+  final NotificationService _notificationService = NotificationService();
 
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
@@ -27,6 +29,11 @@ class JobController extends GetxController {
         todayJobs.value = response.todayJobs;
         upcomingJobs.value = response.upcomingJobs;
         completedJobs.value = response.completedJobs;
+        
+        // Check for new jobs and create notifications
+        final totalJobs = todayJobs.length + upcomingJobs.length;
+        await _notificationService.checkForNewJobs(totalJobs);
+        
         isLoading.value = false;
       } else {
         errorMessage.value = response.message;
