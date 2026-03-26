@@ -597,13 +597,17 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: OutlinedButton.icon(
                     onPressed: () => _pickImage(field.name, isMultiple),
-                    icon: const Icon(Icons.photo_library),
-                    label: Text(isMultiple ? 'Select Photos' : 'Select Photo'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    icon: const Icon(Icons.photo_library, size: 18),
+                    label: Text(
+                      isMultiple ? 'Select Photos' : 'Select Photo',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                      side: const BorderSide(color: Color(0xFF2563EB)),
+                      foregroundColor: const Color(0xFF2563EB),
                     ),
                   ),
                 ),
@@ -611,10 +615,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => _takePhoto(field.name),
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Take Photo'),
+                    icon: const Icon(Icons.camera_alt, size: 18),
+                    label: const Text(
+                      'Take Photo',
+                      style: TextStyle(fontSize: 13),
+                    ),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                       side: const BorderSide(color: Color(0xFF2563EB)),
                       foregroundColor: const Color(0xFF2563EB),
                     ),
